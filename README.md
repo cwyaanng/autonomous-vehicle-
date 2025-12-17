@@ -1,7 +1,3 @@
-# 요구사항
-
-
-
 # 파일 구조
 - agents : 제어 모델 
   - pid_control.py : pid 기반 제어 로직 
