@@ -605,15 +605,10 @@ class SACOfflineOnline(SAC): # SAC 상속한 커스텀 에이전트
                 std_t  = th.tensor(self._nov_rms.var ** 0.5, device=self.device)
                 nov_z = (nov - mean_t) / (std_t + 1e-6)
                 rnd_norm = nov_z.sigmoid()
-                # 수정: 안정성 위해 clamp 방식 사용
-                # w = rnd_norm.clamp(0.05, 0.9)
+            
                 w = th.sigmoid(nov_z.abs() - 1.0) # z=1 넘길 때 반영
                 w = w * 0.9   
                 
-                # if nov_z.std() < 1e-6:
-                #    w = w * 0 + 0.5                          
-             
-            # critic 업데이트 
             current_q1, current_q2 = self.policy.critic(replay_data.observations, replay_data.actions)
             critic_loss = 0.5 * (F.mse_loss(current_q1, target_q_sac) + F.mse_loss(current_q2, target_q_sac))
             critic_losses.append(float(critic_loss.detach().cpu().numpy()))
@@ -644,27 +639,10 @@ class SACOfflineOnline(SAC): # SAC 상속한 커스텀 에이전트
             w = w.detach()
             if w.dim() == 1:
                 w = w.view(-1, 1)
-
-            # if float((self._nov_rms.var ** 0.5).mean()) < 1e-8:
-            #     w = w * 0.0 + 0.5
             
             self.q_rms.update(min_q_pi.detach())  # (B,1) 또는 (B,)
             self.g_rms.update(g_pi.detach())
 
-            # # monte carlo 근사치를 z score 로 바꾼 다음 q 스케일에 맞게 변경 
-            # mu_q  = self.q_rms.mean
-            # std_q = th.sqrt(self.q_rms.var).clamp_min(1e-6)
-            # mu_g  = self.g_rms.mean
-            # std_g = th.sqrt(self.g_rms.var).clamp_min(1e-6)
-
-            # g_pi_cal = (g_pi - mu_g) * (std_q / std_g) + mu_q
-
-            # # 과도한 치우침 방지 클램프
-            # k = 5.0
-            # g_pi_cal = th.clamp(g_pi_cal, mu_q - k*std_q, mu_q + k*std_q)
-
-            # 절대 스케일 유지한 convex-combine
-            ## SAC 실험 [나중에 제거 필요] ## 
             w = 0
             
             

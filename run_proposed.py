@@ -8,7 +8,7 @@ sys.path.append('/home/wise/chaewon/PythonAPI/carla-0.9.8-py3.5-linux-x86_64.egg
 import carla  
 import gym
 import numpy as np
-from agents.sacrnd_model_revised import SACOfflineOnline
+from agents.sacrnd_model import SACOfflineOnline
 from env.env_set import attach_camera_sensor, attach_collision_sensor, connect_to_carla, spawn_vehicle
 from env.route import generate_route, visualize_all_waypoints
 from utils.visualize import generate_actual_path_plot, plot_carla_map
@@ -25,10 +25,7 @@ def make_env(start_point):
     
     # carla 연결 
     client, world, carla_map = connect_to_carla()
-    # 주행 시작 포인트 
-    # town3 : (0,0)
-    # town4 : (300,-100)
-    
+   
     env = CarlaWrapperEnv(
         client=client,
         world=world,

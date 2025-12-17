@@ -84,39 +84,37 @@ def analyze_comprehensive_report(x_axis, y_proposed, y_baseline, name):
 
     p_mean, p_std = np.mean(prop_abs_pct), np.std(prop_abs_pct)
     b_mean, b_std = np.mean(base_abs_pct), np.std(base_abs_pct)
-
-    # 2. 추월(Overtake) 시점 분석
     diff = y_proposed - y_baseline
     winning_mask = diff > 0
 
     if np.all(winning_mask):
-        overtake_msg = "👑 시작부터 끝까지 압도적 우위 (Always Win)"
+        overtake_msg = "Always Win"
     elif not np.any(winning_mask):
         max_gap = np.max(diff)
-        overtake_msg = f"💀 추월 실패 (최선일 때도 {max_gap:.1f} Waypoint 뒤쳐짐)"
+        overtake_msg = f"추월 실패 (최선일 때도 {max_gap:.1f} Waypoint 뒤쳐짐)"
     else:
         first_win_idx = np.argmax(winning_mask)
         first_win_x = x_axis[first_win_idx]
 
         if first_win_idx == 0:
-            overtake_msg = "🚀 시작부터 리드 유지 (Initial Lead)"
+            overtake_msg = "시작부터 리드 유지 (Initial Lead)"
         else:
             prev_gap = diff[first_win_idx - 1]
             curr_gap = diff[first_win_idx]
             overtake_msg = (
-                f"🔥 Progress {first_win_x:.1f}% 에서 역전 성공! "
+                f"Progress {first_win_x:.1f}% 에서 역전 성공! "
                 f"(Gap: {prev_gap:.1f} ➔ +{curr_gap:.1f})"
             )
 
     # 3. 리포트 텍스트 구성
     report = [
         f"Proposed vs {name} Analysis Result:",
-        f"   📊 [Absolute Stats] (Max {MAX_WAYPOINT} WP = 100%)",
+        f"   [Absolute Stats] (Max {MAX_WAYPOINT} WP = 100%)",
         f"       🔴 Proposed : {p_mean:.2f}% ± {p_std:.2f}% (Avg ± Std)",
         f"       🔵 {name:<8} : {b_mean:.2f}% ± {b_std:.2f}%",
-        f"   ⚔️ [Critical Moment]",
+        f"   [Critical Moment]",
         f"       {overtake_msg}",
-        f"   📉 [Loss Intervals] 상대적 열세 구간 상세"
+        f"   [Loss Intervals] 상대적 열세 구간 상세"
     ]
 
     # 4. 상대적 열세(Loss) 구간 상세 분석
@@ -125,7 +123,7 @@ def analyze_comprehensive_report(x_axis, y_proposed, y_baseline, name):
     neg_indices = np.where(diff_percent < 0)[0]
 
     if len(neg_indices) == 0:
-        report.append("       ✨ No Loss Intervals (무결점)")
+        report.append(" No Loss Intervals")
         return "\n".join(report)
 
     groups = np.split(
@@ -140,10 +138,10 @@ def analyze_comprehensive_report(x_axis, y_proposed, y_baseline, name):
         mean_loss = np.mean(diff_percent[g])
 
         if start_x <= 0.5:
-            timing_str = f"🏁 초반 열세 (~{end_x:.1f}% 까지)"
+            timing_str = f" 초반 열세 (~{end_x:.1f}% 까지)"
         else:
             timing_str = (
-                f"⚠️ {start_x:.1f}%에서 역전당함 -> {end_x:.1f}%에서 회복"
+                f"{start_x:.1f}%에서 역전당함 -> {end_x:.1f}%에서 회복"
             )
 
         report.append(
@@ -162,7 +160,6 @@ print(f"Loading data from: {BASE_DIR}")
 for method, pattern in file_patterns.items():
     files = glob.glob(pattern)
     if not files:
-        # 혹시 상대 경로 패턴만 있는 경우 대비
         files = glob.glob(os.path.basename(pattern))
     if not files:
         continue
@@ -179,12 +176,11 @@ for method, pattern in file_patterns.items():
 
         # Step → Progress (%)
         df['Progress'] = (df['Step'] / max_step) * 100
-        # Rolling smoothing
+  
         df['Smoothed'] = df['Value'].rolling(
             window=WINDOW_SIZE, min_periods=1
         ).mean()
-
-        # 공통 X축(COMMON_PROGRESS)에 맞춰 보간
+        
         interp_val = np.interp(
             COMMON_PROGRESS, df['Progress'], df['Smoothed']
         )
@@ -196,7 +192,7 @@ for method, pattern in file_patterns.items():
         )
 
 # ==========================================
-# 5. ADVANTAGE 계산 + 플로팅 (평균 곡선은 그래프에서 제거)
+# 5. ADVANTAGE 계산 + 플로팅 
 # ==========================================
 if "Proposed" in method_means:
     proposed_curve = method_means["Proposed"]
@@ -206,14 +202,12 @@ if "Proposed" in method_means:
     baseline_curves = list(baseline_data.values())
 
     if baseline_curves:
-        # 평균 곡선은 리포트용으로만 사용 (그래프에는 안 그림)
         avg_baseline_curve = np.mean(
             np.vstack(baseline_curves), axis=0
         )
 
-        # --- 리포트 출력 ---
         print("\n" + "=" * 60)
-        print("📢 최종 종합 분석 리포트 (Stats + Overtake + Loss)")
+        print("최종 결과")
         print("=" * 60)
         print(
             analyze_comprehensive_report(
@@ -232,10 +226,8 @@ if "Proposed" in method_means:
             print("-" * 20)
         print("=" * 60 + "\n")
 
-        # --- 그래프 그리기 (평균 곡선 없음, 개별만) ---
         fig, ax = plt.subplots(figsize=FIG_SIZE)
 
-        # X축 스케일 변환 (0~25% 구간 조금 넓게 보는 효과)
         ax.set_xscale(
             'function',
             functions=(
@@ -245,8 +237,7 @@ if "Proposed" in method_means:
         )
 
         ax.axhline(0, color='gray', linewidth=2, linestyle='--')
-
-        # 개별 Baseline 대비 Advantage (실선 + 매우 옅은 영역)
+        
         for base_name, base_curve in baseline_data.items():
             indiv_adv_pct = (
                 proposed_curve - base_curve
@@ -262,7 +253,6 @@ if "Proposed" in method_means:
                 label=f'Proposed vs {base_name}'
             )
 
-            # 아주 옅은 영역 (서로 겹쳐도 평균을 안 그리니 덜 복잡함)
             ax.fill_between(
                 COMMON_PROGRESS, 0, indiv_adv_pct,
                 where=(indiv_adv_pct >= 0),
@@ -274,7 +264,6 @@ if "Proposed" in method_means:
                 color=color, alpha=0.05, interpolate=True
             )
 
-        # 타이틀 & 라벨
         ax.set_title(
             "Performance Advantage over Baselines",
             fontsize=FONT_SIZE_TITLE,
@@ -316,7 +305,3 @@ if "Proposed" in method_means:
         print(f"Graph generated: {output_filename}")
         plt.show()
 
-    else:
-        print("비교할 Baseline 데이터가 없습니다.")
-else:
-    print("Proposed(제안 기법) 데이터가 없습니다.")
