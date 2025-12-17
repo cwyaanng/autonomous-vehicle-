@@ -1,4 +1,4 @@
-# 파일 구조
+## 파일 구조
 - agents : 제어 모델 
   - pid_control.py : pid 기반 제어 로직 
   - sac.py : sac 모델을 정의한 부분  
@@ -21,17 +21,17 @@
   evaluate_town1.py : town1에서 학습한 모델을 불러와 평가
   evaluate_town4.py : town4에서 학습한 모델을 불러와 평가 
 
-# 시뮬레이션 환경에서 강화학습 실행 or  오프라인 데이터 수집 실행 코드 
+## 시뮬레이션 환경에서 강화학습 실행 or  오프라인 데이터 수집 실행 코드 
 - run.py : PID controller로 데이터를 수집할 때 실행하는 코드
 - run_proposed.py : 제안 기법으로 강화학습을 실행하는 코드
 - awac_baseline.py : awac 학습을 실행하는 코드 
 - baseline.py : cql 학습을 실행하는 코드 
 
-# 주행 시작 포인트 
+## 주행 시작 포인트 
   town3 : (0,0)
   town4 : (300,-100)
     
 
-# 시각화 or 결과 분석 코드 
+## 시각화 or 결과 분석 코드 
 - make_plot.py : waypoint 진행도를 시각화해서 나타내는 코드 (window_size = 100으로 smoothing)
 - make_plot_collision_reached.py : 6번에 seed 동안 학습하는 training phase에서 집계된 충돌률, 도달률을 집계하는 코드
