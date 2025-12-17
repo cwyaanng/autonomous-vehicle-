@@ -1,3 +1,0 @@
-bash: line 1:  9051 Aborted                 (core dumped) python -u run_sacrnd.py > retest5.txt 2>&1
-bash: line 1:  9715 Aborted                 (core dumped) python -u run_sacrnd.py > retest6.txt 2>&1
-bash: line 1:  8343 Aborted                 (core dumped) python -u awac_baseline.py > awac_5.txt 2>&1
