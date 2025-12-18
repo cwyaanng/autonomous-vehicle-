@@ -1667,3 +1667,50 @@ cal_q_count:0
 실제 주행 경로가 시각화되어 저장됨: logs/일반화실험_SAC_모델저장/20251218_160916/route_visualization/_20251218_171521/actual_vs_planned_20251218_171521.png
 [onl] up 518000 | crit:39.3431 | actor:-660.4027
 [onl] up 519000 | crit:124.0185 | actor:-659.7120
+[Update 520000]
+q_pi: q_pi | shape: [256, 1] | mean: 666.7513 | std: 121.5963 | min: -78.9327 | max: 769.1185
+logp: logp | shape: [256, 1] | mean: 2.9786 | std: 1.4930 | min: -2.2325 | max: 10.4019
+alpha: 0.2863367795944214
+cal_q: calibrated_q | shape: [256, 1] | mean: 666.7513 | std: 121.5963 | min: -78.9327 | max: 769.1185
+cal_q_count:0
+--------------------------------------------------
+[onl] up 520000 | crit:41.3910 | actor:-665.8985
+충돌 발생 - 충돌 대상: static.unknown
+충돌 발생 - 충돌 대상: static.unknown
+실제 주행 경로가 시각화되어 저장됨: logs/일반화실험_SAC_모델저장/20251218_160916/route_visualization/_20251218_171534/actual_vs_planned_20251218_171534.png
+[onl] up 521000 | crit:55.6808 | actor:-672.7308
+[onl] up 522000 | crit:133.2725 | actor:-677.2617
+충돌 발생 - 충돌 대상: static.pole
+실제 주행 경로가 시각화되어 저장됨: logs/일반화실험_SAC_모델저장/20251218_160916/route_visualization/_20251218_171551/actual_vs_planned_20251218_171551.png
+[onl] up 523000 | crit:39.3436 | actor:-666.4901
+[onl] up 524000 | crit:425.7955 | actor:-659.7289
+충돌 발생 - 충돌 대상: static.unknown
+실제 주행 경로가 시각화되어 저장됨: logs/일반화실험_SAC_모델저장/20251218_160916/route_visualization/_20251218_171607/actual_vs_planned_20251218_171607.png
+[Update 525000]
+q_pi: q_pi | shape: [256, 1] | mean: 664.2774 | std: 117.8753 | min: 99.6579 | max: 747.3407
+logp: logp | shape: [256, 1] | mean: 2.9842 | std: 1.6516 | min: -4.5639 | max: 14.8482
+alpha: 0.30240529775619507
+cal_q: calibrated_q | shape: [256, 1] | mean: 664.2774 | std: 117.8753 | min: 99.6579 | max: 747.3407
+cal_q_count:0
+--------------------------------------------------
+[onl] up 525000 | crit:1000.1843 | actor:-663.3749
+[onl] up 526000 | crit:160.6245 | actor:-654.0731
+충돌 발생 - 충돌 대상: static.vegetation
+충돌 발생 - 충돌 대상: static.vegetation
+실제 주행 경로가 시각화되어 저장됨: logs/일반화실험_SAC_모델저장/20251218_160916/route_visualization/_20251218_171624/actual_vs_planned_20251218_171624.png
+[onl] up 527000 | crit:65.1143 | actor:-673.1118
+[onl] up 528000 | crit:40.1676 | actor:-669.9163
+충돌 발생 - 충돌 대상: static.unknown
+실제 주행 경로가 시각화되어 저장됨: logs/일반화실험_SAC_모델저장/20251218_160916/route_visualization/_20251218_171636/actual_vs_planned_20251218_171636.png
+[onl] up 529000 | crit:53.4825 | actor:-675.5167
+[Update 530000]
+q_pi: q_pi | shape: [256, 1] | mean: 671.6868 | std: 107.6471 | min: 117.4384 | max: 760.5843
+logp: logp | shape: [256, 1] | mean: 2.9676 | std: 1.3872 | min: -2.7957 | max: 5.8826
+alpha: 0.28737518191337585
+cal_q: calibrated_q | shape: [256, 1] | mean: 671.6868 | std: 107.6471 | min: 117.4384 | max: 760.5843
+cal_q_count:0
+--------------------------------------------------
+[onl] up 530000 | crit:45.1653 | actor:-670.8340
+충돌 발생 - 충돌 대상: static.vegetation
+충돌 발생 - 충돌 대상: static.vegetation
+실제 주행 경로가 시각화되어 저장됨: logs/일반화실험_SAC_모델저장/20251218_160916/route_visualization/_20251218_171651/actual_vs_planned_20251218_171651.png

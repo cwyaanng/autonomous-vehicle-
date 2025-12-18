@@ -1,4 +1,4 @@
-````markdown
+
 ## 파일 구조
 
 ### agents : 제어 모델
@@ -159,5 +159,3 @@ Town01 / Town02 / Town03 / Town04 / Town05
 
 * docs/SETUP.md
 
-```
-```
