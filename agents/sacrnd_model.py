@@ -142,12 +142,9 @@ class SACOfflineOnline(SAC): # SAC 상속한 커스텀 에이전트
 
     def load_mcnet(self, path: str):
         ckpt = th.load(path, map_location=self.device)
-        # 1) 구조
         self.mcnet.load_state_dict(ckpt["mcnet"])
-        # 2) 옵티마(이어학습이면)
         if "mcnet_opt" in ckpt:
             self.mcnet.optimizer.load_state_dict(ckpt["mcnet_opt"])
-        # 3) 정규화 통계 복원 (핵심)
         for name, rms in [("obs_rms", self.obs_rms), ("act_rms", self.act_rms)]:
             rms.mean  = ckpt[name]["mean"].to(self.device)
             rms.var   = ckpt[name]["var"].to(self.device)
@@ -180,58 +177,6 @@ class SACOfflineOnline(SAC): # SAC 상속한 커스텀 에이전트
         self.rnd.device = str(self.device)
         self._mc_returns = None
         self._mc_cached_size = -1
-
-    def prefill_from_npz_folder(self, data_dir: str, clip_actions: bool = True) -> int:
-        self.mc_targets = [] 
-        files = sorted(glob.glob(os.path.join(data_dir, "route_6*.npz")))
-        if not files:
-            raise FileNotFoundError(f"No .npz files in {data_dir}")
-
-        act_low = getattr(self.action_space, "low", None)
-        act_high = getattr(self.action_space, "high", None)
-
-        n_added, n_files = 0, 0
-        all_rews = []
-        all_dones = []
-        for path in files:
-            with np.load(path, allow_pickle=False) as d:
-                obs = d["observations"].astype(np.float32)
-                acts = d["actions"].astype(np.float32)
-                rews = d["rewards"].astype(np.float32).reshape(-1, 1)
-                nobs = d["next_observations"].astype(np.float32)
-                dones = d["terminals"].astype(np.float32).reshape(-1, 1)
-
-            N = min(len(obs), len(acts), len(rews), len(nobs), len(dones))
-            if N == 0:
-                continue
-            obs, acts, rews, nobs, dones = obs[:N], acts[:N], rews[:N], nobs[:N], dones[:N]
-
-            if clip_actions and act_low is not None and act_high is not None:
-                acts = np.clip(acts, act_low, act_high)
-
-            for o, no, a, r, d in zip(obs, nobs, acts, rews, dones): 
-                self.replay_buffer.add(
-                    o[None, :],                           # (1, obs_dim)
-                    no[None, :],                          # (1, obs_dim)
-                    a[None, :],                           # (1, act_dim)
-                    np.array([float(r)], np.float32),     # (1,)
-                    np.array([bool(d)], np.float32),      # (1,)
-                    [{"TimeLimit.truncated": False}],     # info list 길이 = n_envs(=1)
-                )
-                all_rews.append(float(r))
-                all_dones.append(bool(d))
-                self.obs_rms.update(th.tensor(o).unsqueeze(0))  # shape (1, obs_dim)
-                self.act_rms.update(th.tensor(a).unsqueeze(0))  # shape (1, act_dim)
-            n_added += N
-            n_files += 1
-     
-        mc_returns = self.compute_mc_returns(
-            gamma=self.gamma,
-            rewards=np.array(all_rews),
-            dones=np.array(all_dones)
-        )
-        self.mc_targets = mc_returns.tolist()
-        return n_added
 
     def prefill_from_npz_folder_mclearn(self, data_dir: str, clip_actions: bool = True) -> int: 
         self.mc_targets = [] 
@@ -297,8 +242,8 @@ class SACOfflineOnline(SAC): # SAC 상속한 커스텀 에이전트
         obs = batch.observations.to(self.device)
         act = batch.actions.to(self.device)
 
-        #[!! 배치별 정규화 중 !!]
-        obs_n = self.obs_rms.normalize(obs)  # was: _normalize_tensor(...)
+        #[배치별 정규화]
+        obs_n = self.obs_rms.normalize(obs) 
         act_n = self.act_rms.normalize(act)
         
         x = th.cat([obs_n, act_n], dim=1)
@@ -457,87 +402,6 @@ class SACOfflineOnline(SAC): # SAC 상속한 커스텀 에이전트
             logp = logp.view(-1, 1)
         return a, logp
 
-    # critic을 offline data로 사전학습하는 함수 
-    def pretrain_critic(self, epochs: int = 8, batch_size: int = 256) -> None:
-        """
-        Critic을 Monte Carlo return (self.mc_targets)에 맞춰 supervised pretrain.
-        - Actor는 freeze
-        - Critic만 학습
-        """
-        self.policy.actor.eval()
-        self.policy.critic.train()
-
-        dataset_size = len(self.mc_targets)
-        buffer_len = self.replay_buffer.pos if not self.replay_buffer.full else self.replay_buffer.buffer_size
-        assert dataset_size == buffer_len, \
-            f"Size mismatch: mc_targets({dataset_size}) vs buffer({buffer_len})"
-
-        mc_targets_np = np.array(self.mc_targets, dtype=np.float32)
-
-        for epoch in range(epochs):
-            perm = np.random.permutation(dataset_size)
-
-            for i in range(0, dataset_size, batch_size):
-                idxs = perm[i:i + batch_size]
-
-                # (s,a) from buffer
-                obs = th.tensor(
-                    self.replay_buffer.observations[idxs].squeeze(1),
-                    dtype=th.float32,
-                    device=self.device
-                )
-                act = th.tensor(
-                    self.replay_buffer.actions[idxs].squeeze(1),
-                    dtype=th.float32,
-                    device=self.device
-                )
-
-                # Monte Carlo return as supervised target
-                target_q = th.tensor(mc_targets_np[idxs], dtype=th.float32).unsqueeze(-1).to(self.device)
-
-                # Q(s,a) from critic
-                q1, q2 = self.policy.critic(obs, act)
-
-                # supervised loss
-                critic_loss = F.mse_loss(q1, target_q) + F.mse_loss(q2, target_q)
-
-                self.policy.critic.optimizer.zero_grad()
-                critic_loss.backward()
-                self.policy.critic.optimizer.step()
-
-            print(f"[Critic-MC] Epoch {epoch+1}/{epochs} | Loss: {critic_loss.item():.4f}")
-
-        self.policy.actor.train()
-        self.policy.critic.train()
-
-    # behavior cloning 기반 pretraining 
-    def pretrain_actor(self, steps: int = 5000) -> None:
-
-        self.policy.actor.train()
-        self.policy.critic.eval()
-
-        for p in self.policy.critic.parameters():
-            p.requires_grad = False
-
-        for step in range(steps):
-            batch = self.replay_buffer.sample(self.batch_size)
-
-            pred_actions = self.policy.actor(batch.observations)
-            bc_loss = F.mse_loss(pred_actions, batch.actions)
-
-            self.policy.actor.optimizer.zero_grad()
-            bc_loss.backward()
-            self.policy.actor.optimizer.step()
-
-            if step % 500 == 0:
-                print(f"[BC pretrain] step {step} | loss: {bc_loss.item():.4f}")
-
-        for p in self.policy.critic.parameters():
-            p.requires_grad = True
-
-        self.policy.critic.train()
-        self.policy.actor.train()  
-
 
 
     def train(self, gradient_steps: int, batch_size: int = 64) -> None:
@@ -603,12 +467,11 @@ class SACOfflineOnline(SAC): # SAC 상속한 커스텀 에이전트
                 std_t  = th.tensor(self._nov_rms.var ** 0.5, device=self.device)
                 nov_z = (nov - mean_t) / (std_t + 1e-6)
                 rnd_norm = nov_z.sigmoid()
-                # 수정: 안정성 위해 clamp 방식 사용
-                # w = rnd_norm.clamp(0.05, 0.9)
-                w = th.sigmoid(nov_z.abs() - 1.0) # z=1 넘길 때 반영
+       
+                w = th.sigmoid(nov_z.abs() - 1.0) 
                 w = w * 0.9                      
              
-            # critic 업데이트 
+
             current_q1, current_q2 = self.policy.critic(replay_data.observations, replay_data.actions)
             critic_loss = 0.5 * (F.mse_loss(current_q1, target_q_sac) + F.mse_loss(current_q2, target_q_sac))
             critic_losses.append(float(critic_loss.detach().cpu().numpy()))
@@ -617,15 +480,13 @@ class SACOfflineOnline(SAC): # SAC 상속한 커스텀 에이전트
             critic_loss.backward()
             self.policy.critic.optimizer.step()
 
-            # actor 업데이트 
+
             q1_pi, q2_pi = self.policy.critic(replay_data.observations, actions_pi) 
             min_q_pi = th.min(q1_pi, q2_pi)
 
-            # 수정: 정식 deterministic action 계산 방식
             with th.no_grad():
                 deterministic_action = self.policy._predict(replay_data.observations, deterministic=True)
 
-            # (3) normalization 후 mcnet 입력
             obs_n = self.obs_rms.normalize(replay_data.observations)
             act_n = self.act_rms.normalize(deterministic_action)
             g_pi = self.mcnet(th.cat([obs_n, act_n], dim=1)).detach()
@@ -635,20 +496,13 @@ class SACOfflineOnline(SAC): # SAC 상속한 커스텀 에이전트
             mask = (g_pi < min_q_pi)
             self.calibrated += int(mask.sum().item())
        
-            # novelty 계산
             w = w.detach()
             if w.dim() == 1:
                 w = w.view(-1, 1)
 
-            # if float((self._nov_rms.var ** 0.5).mean()) < 1e-8:
-            #     w = w * 0.0 + 0.5
-            
-            self.q_rms.update(min_q_pi.detach())  # (B,1) 또는 (B,)
+            self.q_rms.update(min_q_pi.detach()) 
             self.g_rms.update(g_pi.detach())
 
-            ## SAC 실험 [나중에 제거 필요] ## 
-            # w = 0
-            
             calibrated_q = (1 - w) * min_q_pi + w * cali_q
 
 

@@ -1,0 +1,166 @@
+================================================================================
+1) HARDWARE / SYSTEM INFORMATION
+================================================================================
+OS          : Linux-5.15.0-139-generic-x86_64-with-debian-bullseye-sid
+Python      : 3.7.16
+CPU cores   : 28
+RAM total   : 62.62 GB
+CUDA        : available (1 GPU(s))
+  GPU 0 name : NVIDIA GeForce RTX 4090
+
+
+================================================================================
+2) STABLE-BASELINES3 SAC MODEL ARCHITECTURE
+================================================================================
+SAC policy class : SACPolicy
+
+[SAC policy network structure]
+SACPolicy(
+  (actor): Actor(
+    (features_extractor): FlattenExtractor(
+      (flatten): Flatten(start_dim=1, end_dim=-1)
+    )
+    (latent_pi): Sequential(
+      (0): Linear(in_features=3, out_features=256, bias=True)
+      (1): ReLU()
+      (2): Linear(in_features=256, out_features=256, bias=True)
+      (3): ReLU()
+    )
+    (mu): Linear(in_features=256, out_features=1, bias=True)
+    (log_std): Linear(in_features=256, out_features=1, bias=True)
+  )
+  (critic): ContinuousCritic(
+    (features_extractor): FlattenExtractor(
+      (flatten): Flatten(start_dim=1, end_dim=-1)
+    )
+    (qf0): Sequential(
+      (0): Linear(in_features=4, out_features=256, bias=True)
+      (1): ReLU()
+      (2): Linear(in_features=256, out_features=256, bias=True)
+      (3): ReLU()
+      (4): Linear(in_features=256, out_features=1, bias=True)
+    )
+    (qf1): Sequential(
+      (0): Linear(in_features=4, out_features=256, bias=True)
+      (1): ReLU()
+      (2): Linear(in_features=256, out_features=256, bias=True)
+      (3): ReLU()
+      (4): Linear(in_features=256, out_features=1, bias=True)
+    )
+  )
+  (critic_target): ContinuousCritic(
+    (features_extractor): FlattenExtractor(
+      (flatten): Flatten(start_dim=1, end_dim=-1)
+    )
+    (qf0): Sequential(
+      (0): Linear(in_features=4, out_features=256, bias=True)
+      (1): ReLU()
+      (2): Linear(in_features=256, out_features=256, bias=True)
+      (3): ReLU()
+      (4): Linear(in_features=256, out_features=1, bias=True)
+    )
+    (qf1): Sequential(
+      (0): Linear(in_features=4, out_features=256, bias=True)
+      (1): ReLU()
+      (2): Linear(in_features=256, out_features=256, bias=True)
+      (3): ReLU()
+      (4): Linear(in_features=256, out_features=1, bias=True)
+    )
+  )
+)
+
+[SAC actor network (mu/head)]
+Could not access actor mu network: 'SACPolicy' object has no attribute 'mu'
+
+[SAC critic / Q-networks]
+--- model.policy.critic ---
+ContinuousCritic(
+  (features_extractor): FlattenExtractor(
+    (flatten): Flatten(start_dim=1, end_dim=-1)
+  )
+  (qf0): Sequential(
+    (0): Linear(in_features=4, out_features=256, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=256, out_features=256, bias=True)
+    (3): ReLU()
+    (4): Linear(in_features=256, out_features=1, bias=True)
+  )
+  (qf1): Sequential(
+    (0): Linear(in_features=4, out_features=256, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=256, out_features=256, bias=True)
+    (3): ReLU()
+    (4): Linear(in_features=256, out_features=1, bias=True)
+  )
+)
+--- model.policy.critic_target ---
+ContinuousCritic(
+  (features_extractor): FlattenExtractor(
+    (flatten): Flatten(start_dim=1, end_dim=-1)
+  )
+  (qf0): Sequential(
+    (0): Linear(in_features=4, out_features=256, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=256, out_features=256, bias=True)
+    (3): ReLU()
+    (4): Linear(in_features=256, out_features=1, bias=True)
+  )
+  (qf1): Sequential(
+    (0): Linear(in_features=4, out_features=256, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=256, out_features=256, bias=True)
+    (3): ReLU()
+    (4): Linear(in_features=256, out_features=1, bias=True)
+  )
+)
+
+
+================================================================================
+3) D3RLPY AWAC / CQL MODEL ARCHITECTURE (TEMPLATE)
+================================================================================
+d3rlpy version: 0.90
+
+[AWAC default model info]
+d3rlpy.algos.awac.AWAC(action_scaler=None, actor_encoder_factory=d3rlpy.models.encoders.DefaultEncoderFactory(activation='relu', use_batch_norm=False, dropout_rate=None), actor_learning_rate=0.0003, actor_optim_factory=d3rlpy.models.optimizers.AdamFactory(optim_cls='Adam', betas=(0.9, 0.999), eps=1e-08, weight_decay=0.0001, amsgrad=False), batch_size=1024, critic_encoder_factory=d3rlpy.models.encoders.DefaultEncoderFactory(activation='relu', use_batch_norm=False, dropout_rate=None), critic_learning_rate=0.0003, critic_optim_factory=d3rlpy.models.optimizers.AdamFactory(optim_cls='Adam', betas=(0.9, 0.999), eps=1e-08, weight_decay=0, amsgrad=False), gamma=0.99, generated_maxlen=100000, impl=<d3rlpy.algos.torch.awac_impl.AWACImpl object at 0x7f8263068590>, lam=1.0, max_weight=20.0, n_action_samples=1, n_critics=2, n_frames=1, n_steps=1, q_func_factory=d3rlpy.models.q_functions.MeanQFunctionFactory(bootstrap=False, share_encoder=False), real_ratio=1.0, scaler=None, target_reduction_type='min', tau=0.005, update_actor_interval=1, use_gpu=None)
+
+AWAC implementation object:
+<d3rlpy.algos.torch.awac_impl.AWACImpl object at 0x7f8263068590>
+
+[CQL default model info]
+d3rlpy.algos.cql.CQL(action_scaler=None, actor_encoder_factory=d3rlpy.models.encoders.DefaultEncoderFactory(activation='relu', use_batch_norm=False, dropout_rate=None), actor_learning_rate=0.0001, actor_optim_factory=d3rlpy.models.optimizers.AdamFactory(optim_cls='Adam', betas=(0.9, 0.999), eps=1e-08, weight_decay=0, amsgrad=False), alpha_learning_rate=0.0001, alpha_optim_factory=d3rlpy.models.optimizers.AdamFactory(optim_cls='Adam', betas=(0.9, 0.999), eps=1e-08, weight_decay=0, amsgrad=False), alpha_threshold=10.0, batch_size=256, conservative_weight=5.0, critic_encoder_factory=d3rlpy.models.encoders.DefaultEncoderFactory(activation='relu', use_batch_norm=False, dropout_rate=None), critic_learning_rate=0.0003, critic_optim_factory=d3rlpy.models.optimizers.AdamFactory(optim_cls='Adam', betas=(0.9, 0.999), eps=1e-08, weight_decay=0, amsgrad=False), gamma=0.99, generated_maxlen=100000, impl=<d3rlpy.algos.torch.cql_impl.CQLImpl object at 0x7f82631d0590>, initial_alpha=1.0, initial_temperature=1.0, n_action_samples=10, n_critics=2, n_frames=1, n_steps=1, q_func_factory=d3rlpy.models.q_functions.MeanQFunctionFactory(bootstrap=False, share_encoder=False), real_ratio=1.0, scaler=None, soft_q_backup=False, target_reduction_type='min', tau=0.005, temp_learning_rate=0.0001, temp_optim_factory=d3rlpy.models.optimizers.AdamFactory(optim_cls='Adam', betas=(0.9, 0.999), eps=1e-08, weight_decay=0, amsgrad=False), use_gpu=None)
+
+CQL implementation object:
+<d3rlpy.algos.torch.cql_impl.CQLImpl object at 0x7f82631d0590>
+
+Note:
+
+- d3rlpy 0.90 의 내부 구현(impl)은 버전에 따라 속성 이름이 다를 수 있습니다.
+- 위 코드에서 OBS_DIM, ACT_DIM 을 실제 CARLA 환경의 관찰/행동 차원으로
+  맞추면, d3rlpy가 사용하는 기본 MLP 구조를 그대로 볼 수 있습니다.
+- 논문에는 이 결과를 요약해서
+  "two-layer MLP with 256 hidden units and ReLU activations"
+  와 같은 형태로 정리해서 쓰면 됩니다.
+
+
+Done.
+================================================================================
+4) PYTHON LIBRARY VERSIONS
+================================================================================
+numpy               : 1.21.6
+pandas              : 1.3.5
+gym                 : 0.26.2
+gymnasium           : 0.28.1
+torch               : 1.13.1+cu117
+torchvision         : NOT INSTALLED
+stable_baselines3   : 1.8.0
+d3rlpy              : 0.90
+psutil              : 7.0.0
+matplotlib          : 3.5.3
+seaborn             : 0.12.2
+scipy               : 1.7.3
+sklearn             : 1.0.2
+yaml                : 6.0.1
+tqdm                : 4.67.1
+carla               : NOT INSTALLED
+
+

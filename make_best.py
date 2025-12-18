@@ -73,12 +73,7 @@ def load_tensorboard_csv(path):
     except Exception:
         return None
 
-
-# ==========================================
-# 3. [최종] 리포트 분석 함수
-# ==========================================
 def analyze_comprehensive_report(x_axis, y_proposed, y_baseline, name):
-    # 1. 절대 성능 통계 (Max Waypoint 기준)
     prop_abs_pct = (y_proposed / MAX_WAYPOINT) * 100
     base_abs_pct = (y_baseline / MAX_WAYPOINT) * 100
 
@@ -117,7 +112,6 @@ def analyze_comprehensive_report(x_axis, y_proposed, y_baseline, name):
         f"   [Loss Intervals] 상대적 열세 구간 상세"
     ]
 
-    # 4. 상대적 열세(Loss) 구간 상세 분석
     diff_percent = ((y_proposed - y_baseline) /
                     (np.abs(y_baseline) + 1e-6)) * 100
     neg_indices = np.where(diff_percent < 0)[0]

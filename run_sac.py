@@ -1,5 +1,7 @@
 """
-제안 기법을 테스트하는 코드입니다.
+SAC 을 테스트하는 부분입니다. 
+replay buffer에 데이터를 넣어 초기화하고, 학습을 진행하는 부분이 포함되어 있습니다.
+
 """
 import os, sys
 from agents.rnd import RND
@@ -7,7 +9,7 @@ sys.path.append('/home/wise/chaewon/PythonAPI/carla-0.9.8-py3.5-linux-x86_64.egg
 import carla  
 import gym
 import numpy as np
-from agents.sacrnd_model import SACOfflineOnline
+from agents.sac import SACOfflineOnline
 from env.env_set import attach_camera_sensor, attach_collision_sensor, connect_to_carla, spawn_vehicle
 from env.route import generate_route, visualize_all_waypoints
 from utils.visualize import generate_actual_path_plot, plot_carla_map
@@ -17,7 +19,7 @@ from stable_baselines3.common.monitor import Monitor
 from datetime import datetime 
 
 DATA_DIR = "offline_data_for_replaybuffer/dataset_town03"  
-SIMULATION = "일반화실험_제안기법_모델저장"
+SIMULATION = "일반화실험_SAC_모델저장"
 NOW = datetime.now().strftime("%Y%m%d_%H%M%S")
 
 def make_env(start_point, town):
@@ -43,13 +45,11 @@ def make_vec_env(start_point , town):
 def main(start_point, town):
     env = make_vec_env(start_point , town)
     trainer = SACOfflineOnline(env=env, buffer_size=4_000_000, batch_size=256, tau=0.005, verbose=1, tensorboard_log="logs/"+SIMULATION+"/"+NOW)
-    obs_dim = env.observation_space.shape[0] + env.action_space.shape[0]
-    rnd = RND(obs_dim, lr=1e-3, device=str(trainer.device)) 
- 
-    trainer.attach_rnd(rnd) 
+
     trainer.replay_buffer.reset()
     trainer.prefill_from_npz_folder_mclearn(DATA_DIR)
-    trainer.train_mcnet_from_buffer(epochs=30)
+    print("replay buffer 초기화 완료")
+    print("=================== 학습 시작 ====================")
     trainer.online_learn(log_interval=50, total_timesteps=1_500_000, tb_log_name="logs/"+SIMULATION+"/"+NOW)
 
     trainer.save(f"trained_1M_1M_{NOW}.zip")

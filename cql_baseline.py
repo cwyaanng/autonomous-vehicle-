@@ -87,9 +87,9 @@ def build_mdpdataset_from_npz_dir(data_dir: str) -> MDPDataset:
     return dataset
 
 
-def make_env(log_root , start_point):
+def make_env(log_root , start_point , town):
     now = datetime.now().strftime("%Y%m%d_%H%M%S")
-    client, world, carla_map = connect_to_carla()
+    client, world, carla_map = connect_to_carla(town)
     
     env = CarlaWrapperEnv(
         client=client,
@@ -101,7 +101,7 @@ def make_env(log_root , start_point):
     return env
 
 
-def main(start_point):
+def main(start_point, town):
     
     dataset = build_mdpdataset_from_npz_dir(DATA_DIR)
 
@@ -162,7 +162,7 @@ def main(start_point):
 
 
     print("Online Fine-Tuning 시작")
-    env = make_env(LOG_ROOT ,  start_point)
+    env = make_env(LOG_ROOT ,  start_point , town)
     buffer = ReplayBuffer(maxlen=REPLAY_MAXLEN, env=env)
     prefill_buffer_from_dataset(dataset, buffer)
     
@@ -188,15 +188,17 @@ def main(start_point):
 
 
 if __name__ == "__main__":
-
-    if len(sys.argv) != 3:
-        print("실행 명령어 형식: python baseline.py <start_x> <start_y>")
+    if len(sys.argv) != 4:
+        print("입력 형식: python run_proposed.py <start_x> <start_y> <town이름>\n town 이름은 다음 중 하나입니다 : Town01 / Town02 / Town03 / Town04 / Town05")
         sys.exit(1)
 
-    
-    start_x = float(sys.argv[1])
-    start_y = float(sys.argv[2])
-    start_point = (start_x, start_y)
-    
-    main(start_point)
+    try:
+        start_x = float(sys.argv[1])
+        start_y = float(sys.argv[2])
+        town = str(sys.argv[3])
+    except ValueError:
+        print("입력 형식: python run_proposed.py <start_x> <start_y> <town이름>")
+        sys.exit(1)
 
+    start_point = (start_x, start_y)
+    main(start_point, town)

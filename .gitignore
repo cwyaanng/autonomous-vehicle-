@@ -14,11 +14,10 @@ cql_offline_online.d3
 d3rlpy_logs
 dataset_3/
 critic_loss_plot/
-실험결과/
+실험로그/
 offline_data_for_replaybuffer/
 offline_data_visualization
 figs/
 TEST_일반화실험_Town03_to_Town01/
 TEST_일반화실험_Town03_to_Town04/
 __pycache__/
-awac_5.txt
