@@ -511,6 +511,7 @@ class SACOfflineOnline(SAC):
                 print(f"cal_q_count:{self.calibrated}")
                 print("-" * 50)
 
+            """ 6. 보정된 Q 값을 이용하여 actor loss를 계산하고 actor 을 업데이트합니다. """
             actor_loss = (ent_coef * log_prob - calibrated_q).mean()
             actor_losses.append(float(actor_loss.detach().cpu().numpy()))
 
@@ -518,6 +519,7 @@ class SACOfflineOnline(SAC):
             actor_loss.backward()
             self.policy.actor.optimizer.step()
 
+            """ 7. 타겟 네트워크를 업데이트합니다. """
             if global_update % self.target_update_interval == 0:
                 polyak_update(self.policy.critic.parameters(), self.policy.critic_target.parameters(), self.tau)
 

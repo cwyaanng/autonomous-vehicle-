@@ -1,8 +1,9 @@
 """
-  env_set.py 
+  pid_control.py
   
   역할 
-    - PID Control 로직 
+    - PID Controller을 구현해 주행을 하고 강화학습을 위한 offline data를 저장하는 용도의 코드입니다. 
+    
 """
 import math
 import time
@@ -13,12 +14,13 @@ import os
 def find_closest_waypoint_index(loc , route_waypoints):
     """
       현재 차량 위치에서 가장 가까이에 있는 waypoint를 찾아 리턴  
+      
       Args : 
         loc : 현재 차량의 위치
         route_waypoints : 현재 target 경로 안에 들어 있는 waypoints 
         
       return : 
-       waypoint
+       현재 차량 가장 근처의 waypoint
     """
     min_dist = float('inf')
     closest_idx = 0
@@ -46,12 +48,14 @@ def find_closest_waypoints_ahead(loc, route_waypoints, num_ahead=15):
 
 def make_obs_from_waypoints(vehicle, waypoints, e, theta_e):
     """
-    Waypoint들을 차량 기준 좌표계로 변환 + e, theta_e 포함하는 1D state 벡터 생성
+    Waypoint들을 차량 기준 좌표계로 변환합니다.
+    그리고 waypoint에 lateral error, heading error을  포함하는 1D state 벡터를 생성합니다. 
+    
     Args:
         vehicle : carla.Vehicle
-        waypoints : list of carla.Waypoint (앞선 num_ahead개)
-        e : lateral error (compute_errors() 리턴 1)
-        theta_e : heading error (compute_errors() 리턴 2)
+        waypoints : 앞선 15개( num_ahead개 ) 의 Waypoint의 리스트 
+        e : lateral error 
+        theta_e : heading erro 
     """
     # 차량 pose
     tf = vehicle.get_transform()
@@ -120,6 +124,11 @@ def compute_errors(vehicle, target_wp):
 def compute_reward(obs, vehicle, collided=False, reached=False):
     """
     주행 리워드 계산
+    
+    speed 가 높을수록 점수가 크고, lateral & heading error 가 클수록 점수가 깎입니다.
+    
+    충돌 시 -200의 페널티를 주고, 완주 시 200의 reward 을 주었습니다. 
+    
     """
     *_, lateral_error, heading_error = obs
     speed_vec = vehicle.get_velocity()
@@ -143,6 +152,7 @@ def save_episode_as_npz(path, data_dict):
 def pid_steering_control(e, theta_e, previous_error, integral, dt, kp, ki, kd, ke):
     """
     차량의 조향 각도를 PID 제어 방식으로 계산
+    
 
     Args:
         e : lateral error, 차량이 목표 경로에서 얼마나 벗어났는지 (좌우 거리)
@@ -160,6 +170,7 @@ def pid_steering_control(e, theta_e, previous_error, integral, dt, kp, ki, kd, k
     integral += ki * e * dt
     integral = np.clip(integral, -0.5, 0.5)
     derivative = kd * (e - previous_error) / dt
+    
     steer = prop + integral + derivative - ke * theta_e
     steer = -np.clip(steer, -1.0, 1.0)
     return steer, integral
@@ -167,14 +178,14 @@ def pid_steering_control(e, theta_e, previous_error, integral, dt, kp, ki, kd, k
 def pid_throttle_control(target_speed, current_speed, prev_error, integral, dt , kp, ki, kd):
   
     """
-    차량의 속도를 PID 제어 방식으로 계산합니다.
+    목표 속도 (target_speed)를 추종하도록 차량의 속도를 PID 제어 방식으로 계산했습니다.
 
     Args:
         target_speed : 목표 속도 (m/s)
         current_speed : 현재 속도 (m/s)
         prev_error : 이전 루프에서의 속도 오차
         integral : 이전까지 누적된 속도 오차
-        dt : 루프 간 시간 간격 (초)
+        dt : 루프 간 시간 간격 (s))
 
     Returns:
         throttle : 가속 명령 값 (0.0 ~ 1.0)
@@ -200,47 +211,56 @@ def pid_throttle_control(target_speed, current_speed, prev_error, integral, dt ,
 def run_pid_drive_with_log(world, vehicle, route_waypoints, actual_path_x, actual_path_y, collision_event, kp_s, ki_s, kd_s, ke, kp_t, ki_t, kd_t, num, filename, max_steps=3500 ,output_dir = "dataset_town1_real" ):
   
     """
-      PID 기반 주행 시뮬레이션 로직 : grid search로 1000가지 수행, 1000 step 동안 
+      PID Controller을 이용해 주행을 하고, 
+      그 과정에서 발생한 state, action, reward, next state 을 저장합니다. 
+      
+      마지막에는 각 에피소드별로 .npz 파일을 저장하여 추후 강화학습에서 Demonstration data로 사용하고자 했습니다. 
     """
-    steer_integral = 0.0
-    steer_prev_error = 0.0
-    steer_prev = 0.0
+    
+    """ pid control을 위한 변수 초기화 """
+    steer_integral = 0.0 # 오차 누적값 
+    steer_prev_error = 0.0 # 바로 직전 스텝의 오차 
+    steer_prev = 0.0 # 바로 직전의 핸들 값 
 
-    throttle_integral = 0.0
-    throttle_prev_error = 0.0
+    throttle_integral = 0.0 # 속도 오차 누적값 
+    throttle_prev_error = 0.0 # 바로 직전 속도의 오차 
 
     dt = 0.1
-    target_speed = 10.0  
+    target_speed = 10.0  # 목표 속도 
     
+    # 하나의 에피소드 동안의 주행 기록을 저장할 리스트 입니다 
     obs_buf, act_buf, rew_buf, next_obs_buf, done_buf = [], [], [], [], []
     
     last_idx = len(route_waypoints) - 1
+    
+    # 시뮬레이션 동기화 모드 설정 
     settings = world.get_settings()
     settings.synchronous_mode = True
     settings.fixed_delta_seconds = 0.05
     world.apply_settings(settings)
     world.tick()
+    
+    """ max_steps 횟수만큼 pid controller을 이용해 주행 명령을 내리고 실제 주행을 수행합니다 """
     for t in range(max_steps):
         
+        """ 1. 현재 차량 위치, 속도 측정 """
         loc = vehicle.get_location()
         vel = vehicle.get_velocity()
-        speed = np.linalg.norm([vel.x, vel.y, vel.z])  # 현재 속도 (m/s)
+        speed = np.linalg.norm([vel.x, vel.y, vel.z])  
         
+        """ 2. 타겟 waypoint 계산 """
         waypoints_ahead = find_closest_waypoints_ahead(loc, route_waypoints)
         idx = find_closest_waypoint_index(loc, route_waypoints)
         target_idx = min(idx + 5, len(route_waypoints) - 1)
         target_wp = route_waypoints[target_idx]
 
-        
-            
+        """ 3. 타겟 waypoint와 현재 지점 사이의 lateral error, heading error 계산  """
         e, theta_e = compute_errors(vehicle, target_wp)
-        if t % 1000 == 0:  
-            print(f"e : {e}")
-            print(f"theta_e : {theta_e}")
-            
-      
+        
+        """ 4. 현재 차량 상태에서의 state 값 생성 """
         obs = make_obs_from_waypoints(vehicle, waypoints_ahead , e , theta_e)
         
+        """ 5. 위에서 계산한 에러를 PID controller 에 넣어서 steer, throttle 명령 생성 """
         steer, steer_integral = pid_steering_control(e, theta_e, steer_prev_error, steer_integral, dt, ki_s, kp_s, kd_s, ke)
         steer_prev_error = e
         steer = 0.7 * steer + 0.3 * steer_prev 
@@ -250,10 +270,13 @@ def run_pid_drive_with_log(world, vehicle, route_waypoints, actual_path_x, actua
             target_speed, speed, throttle_prev_error, throttle_integral, dt , kp_t, ki_t, kd_t
         )
 
+        """ 6. 생성한 명령을 차량에 적용하고 시뮬레이션 수행 """
         control = carla.VehicleControl(throttle=throttle, steer=steer, brake=brake)
         vehicle.apply_control(control)
         world.tick()
- 
+        
+        
+        """ 7. next state 생성 및 reward 계산 """
         next_loc = vehicle.get_location()
         next_waypoints = find_closest_waypoints_ahead(next_loc, route_waypoints)
         next_idx = find_closest_waypoint_index(loc, route_waypoints)
@@ -268,6 +291,7 @@ def run_pid_drive_with_log(world, vehicle, route_waypoints, actual_path_x, actua
         
         reward = compute_reward(next_obs, vehicle, collided=collided, reached=reached)
 
+        """ 8. 리스트에 앞서 계산한 현재 상태(obs) , 제어 명령, reward, 다음 상태(next_obs) , 종료 여부 추가 """
         obs_buf.append(obs)
         act_buf.append([steer, throttle, brake])
         rew_buf.append(reward)
@@ -277,13 +301,15 @@ def run_pid_drive_with_log(world, vehicle, route_waypoints, actual_path_x, actua
         actual_path_x.append(next_loc.x)
         actual_path_y.append(next_loc.y)
 
+        
         if done:
             if collided:
                 print(f"[{t}] collision occur - simulation stop")
             elif reached:
                 print(f"[{t}] goal reached - simulation stop")
             break
-                
+            
+    """ 9. 주행 하나가 끝나면 .npz 파일로 주행 데이터 저장 """    
     save_episode_as_npz(
         f"{output_dir}/{filename}_route_episode_{num:04d}.npz",
         {

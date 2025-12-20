@@ -4,7 +4,10 @@ from datetime import datetime
 
 def connect_to_carla(town= 'Town03', host='localhost', port=2000):
     """
-      carla 시뮬레이션 환경에 연결 
+      carla 시뮬레이션 환경에 연결하는 메서드입니다. 
+      
+      Args :
+        town : Town01 ~ Town05 까지 넣을 수 있습니다. 
       
       returns :
         client : carla 클라이언트 객체 
@@ -25,17 +28,27 @@ def connect_to_carla(town= 'Town03', host='localhost', port=2000):
 
 def spawn_vehicle(world, blueprint_library, transform):
     """
-      차량 객체를 시뮬레이션 월드에 spawn 
+      차량 객체를 시뮬레이션 월드에 spawn하는 메서드입니다.
+      
+      Args : 
+        world : 앞에서 만든 carla 월드 객체입니다.
+        blueprint_library : world.get_blueprint_library() 로 불러온 객체를 넣습니다. carla 의 차량 객체 목록을 불러오기 위함입니다.
+        transform : 차량을 스폰할 위치를 지정합니다. 
+      
       return :
         vehicle : 차량 
     """
+    transform.location.z += 0.5
     vehicle_bp = blueprint_library.filter('vehicle.*')[0]
     vehicle = world.spawn_actor(vehicle_bp, transform)
+    
     return vehicle
 
 def attach_collision_sensor(world, vehicle):
     """
-      출동 감지 센서를 차량에 부착하고 충돌 이벤트를 추적  
+    
+      충돌 감지 센서를 차량에 부착하고 충돌 이벤트를 추적하는 용도의 메서드입니다. 
+      
     """
     blueprint = world.get_blueprint_library().find('sensor.other.collision')
     sensor_transform = carla.Transform(carla.Location(x=0, y=0, z=0))
@@ -52,8 +65,10 @@ def attach_collision_sensor(world, vehicle):
 def attach_camera_sensor(world, vehicle, image_width=800, image_height=600, fov=90, sensor_tick=0.1, save_path='logs/driving_scene'):
     
     """
-      카메라 센서를 차량에 부착 
+      카메라 센서를 차량에 부착
       카메라 센서가 새로운 이미지 프레임을 캡처할 때마다 콜백 함수 자동 호출 
+      
+      carla 환경에서 사진 촬영 이미지를 얻고 싶을 때 사용하는 메서드입니다. 
     """
     os.makedirs(save_path, exist_ok=True)
     blueprint_library = world.get_blueprint_library()

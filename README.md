@@ -4,7 +4,7 @@
 ### agents : 제어 모델
 - pid_control.py : PID 기반 제어 로직
 - sac.py : SAC 모델 정의
-- sacrnd_model.py : 제안 기법 모델 정의  
+- sacrnd_model_revised.py : 제안 기법 모델 정의  
   (Stable-Baselines3 SAC를 override하여 RND와 MCNet을 결합)
 - rnd.py : Random Network Distillation(RND) 모델 정의
 
@@ -53,6 +53,15 @@
   6개 seed에 대해 training phase 동안의 충돌률 및 도달률 집계
 
 ---
+
+## 테스트 코드 
+
+- evaluate_sac_and_proposed.py : 저장된 제안기법, SAC로 학습한 모델을 불러와 테스트를 하는 코드입니다.
+
+- evaluate_cql_awac.py : 저장된 CQL , AWAC 모델을 불러와 테스트를 하는 코드입니다. 
+
+---
+
 
 ## 실행 절차
 
@@ -129,7 +138,8 @@ nohup python -u run_sac.py 0 0 Town03 > 파일이름.txt 2>&1 &
 ---
 
 ## 주행 시작 포인트
-
+* Town01 : start_point : (0,0) , end_point : (400, 350)
+* Town02 : (250,250)
 * Town03 : (0, 0)
 * Town04 : (300, -100)
 
@@ -157,5 +167,5 @@ Town01 / Town02 / Town03 / Town04 / Town05
 
 ## 추가 문서
 
-* docs/SETUP.md
+* docs/SETUP.md : 환경 설정 과정 및 라이브러리 버전 
 

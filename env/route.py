@@ -1,3 +1,34 @@
+"""
+
+env/route.py
+
+강화학습을 하거나 pid controller로 주행을 할 때 차량이 주행할 경로를 설정하는 함수들이 포함된 파일입니다.
+
+
+function 목록
+
+1. generate_route : 출발점 - 도착점 두개의 지점을 받아, 출발점에서 도착점을 향해 가도록 하며 경로를 생성합니다.
+
+2. generate_forward_route : 출발점만 받고, 지정한 steps 동안 이동하도록 하여 경로를 생성합니다.
+
+경로가 다소 자율주행 차량 운행 용으로 사용하기에는 예쁘지 않은 (loop가 만들어지거나 도착지와 동떨어진 곳에 막다른 길 등...) 부분을 좀 다듬고자 앞 뒤에 슬라이싱을 하게 되어 아래의 함수가 만들어지게 되었습니다.
+
+3. generate_route_town1 - generate_route 에 슬라이싱만 추가한 것 
+
+4. generate_route_town2 - generate_route 에 슬라이싱만 추가한 것 
+
+5. generate_route_town3 - generate_forward_route 에 슬라이싱만 추가한 것 
+
+6. generate_route_town4 - generate_forward_route 에 슬라이싱만 추가한 것  
+
+7. visualize_all_waypints : Town 안에 있는 전체 waypoint를 시각화 하는 함수입니다. 
+경로를 설정할 때 먼저 이것으로 모든 waypoint를 시각화하고, 그걸 보면서 출발지or도착지를 설정하면 약간 더 편리합니다! 
+
+"""
+
+
+
+
 import os
 import carla
 import math
@@ -77,7 +108,6 @@ def generate_route(carla_map, start_coords, end_coords, max_dist=3000, wp_separa
         same_lane_waypoints = [wp for wp in next_waypoints if wp.lane_id == initial_lane_id]
         
         if not same_lane_waypoints:
-            # print(f"경고: 차선 {initial_lane_id}에 다음 웨이포인트가 없습니다. 사용 가능한 웨이포인트 사용.")
             candidate_waypoints = next_waypoints
         else:
             candidate_waypoints = same_lane_waypoints
@@ -100,7 +130,7 @@ def generate_route(carla_map, start_coords, end_coords, max_dist=3000, wp_separa
                 min_distance_to_goal = best_distance
                 closest_wp_to_goal = best_wp
                 
-            if best_distance < 5.0:  # 5미터 이내면 목적지 도달로 간주
+            if best_distance < 5.0:  
                 print(f"목적지에 도달했습니다! (거리: {best_distance:.2f}m)")
                 break
         else:
@@ -141,7 +171,98 @@ def generate_route(carla_map, start_coords, end_coords, max_dist=3000, wp_separa
 
     return route_waypoints
 
+def generate_forward_route(
+    carla_map,
+    start_coords,
+    wp_separation: float = 2.0,
+    steps: int = 2000,          
+    prefer_same_lane: bool = True,    
+    max_steps_cap: int = 100000,      
+    verbose: bool = True,
+):
+    """
+    start_coords에서 시작해 '앞으로' 진행하며 웨이포인트 리스트를 생성.
+    - steps번 앞으로 진행
 
+
+    반환: List[carla.Waypoint]
+    """
+    start_raw = carla.Location(float(start_coords[0]), float(start_coords[1]), 0.0)
+    start_wp = carla_map.get_waypoint(start_raw, project_to_road=True, lane_type=carla.LaneType.Driving)
+    if start_wp is None:
+        if verbose: print(f"[forward] 시작점 근처 도로 없음: ({start_raw.x:.1f}, {start_raw.y:.1f})")
+        return []
+
+    route = [start_wp]
+    cur = start_wp
+    lane_id0 = cur.lane_id
+
+    # 전진 조건
+    remain_steps = steps if steps is not None else None
+    traveled = 0.0
+
+    it = 0
+    while it < max_steps_cap:
+        nxts = cur.next(wp_separation)
+        if not nxts:
+            if verbose: print("[forward] 다음 웨이포인트 없음. 종료")
+            break
+
+        # 후보 선정: 같은 차선 선호(없으면 전체)
+        cand = ([wp for wp in nxts if wp.lane_id == lane_id0] or nxts) if prefer_same_lane else nxts
+
+        # 진행 방향(헤딩) 연속성 + 전진성 점수화
+        best, best_score = None, float("inf")
+        fwd = cur.transform.get_forward_vector()
+        fwd_vec = np.array([fwd.x, fwd.y], dtype=np.float32)
+        fwd_norm = np.linalg.norm(fwd_vec) + 1e-9
+
+        for wp in cand:
+            f2 = wp.transform.get_forward_vector()
+            f2_vec = np.array([f2.x, f2.y], dtype=np.float32)
+            cos_th = float(np.dot(fwd_vec, f2_vec) / (fwd_norm * (np.linalg.norm(f2_vec) + 1e-9)))
+            heading_penalty = 1.0 - np.clip(cos_th, -1.0, 1.0)  
+          
+            dx = wp.transform.location.x - cur.transform.location.x
+            dy = wp.transform.location.y - cur.transform.location.y
+            forward_proj = float((dx * fwd_vec[0] + dy * fwd_vec[1]) / (fwd_norm + 1e-9))
+            forward_penalty = -forward_proj  
+
+            score = 2.0 * heading_penalty + 0.1 * forward_penalty
+            if score < best_score:
+                best_score, best = score, wp
+
+        if best is None:
+            if verbose: print("[forward] 적절한 다음 웨이포인트 없음. 종료")
+            break
+
+        route.append(best)
+        moved = cur.transform.location.distance(best.transform.location)
+        traveled += moved
+        cur = best
+        it += 1
+
+        if remain_steps is not None:
+            remain_steps -= 1
+            if remain_steps <= 0:
+                if verbose: print(f"[forward] steps 완료: traveled={traveled:.1f} m, steps={steps}")
+                break
+
+    if it >= max_steps_cap and verbose:
+        print(f"[forward] max_steps_cap({max_steps_cap}) 도달")
+
+    if verbose:
+        print(f"[forward] 경로 생성: {len(route)} wp, 총 거리 {traveled:.1f} m")
+        
+    if len(route) > 70:
+        route = route[70:]
+        if verbose:
+            print(f"[forward] 처음 {60}개 웨이포인트를 버림 -> {len(route)} wp 남음")
+    else:
+        if verbose:
+            print(f"[forward] 웨이포인트 수가 {60}개 이하라서 자르지 않음")
+
+    return route
 
 
 def generate_route_town1(carla_map, start_coords, end_coords, max_dist=2000, wp_separation=2.0):
@@ -279,12 +400,11 @@ def generate_route_town1(carla_map, start_coords, end_coords, max_dist=2000, wp_
 
     return route_waypoints
 
-
-def generate_forward_route(
+def generate_route_town2(
     carla_map,
     start_coords,
     wp_separation: float = 2.0,
-    steps: int = 1000,          
+    steps: int = 500,          
     prefer_same_lane: bool = True,    
     max_steps_cap: int = 100000,      
     verbose: bool = True,
@@ -372,7 +492,8 @@ def generate_forward_route(
             print(f"[forward] 웨이포인트 수가 {60}개 이하라서 자르지 않음")
 
     return route
-  
+
+
 
 def generate_route_town3(
     carla_map,
