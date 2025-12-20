@@ -1,8 +1,15 @@
 # agents/sac.py
+"""
+이 파일은 SB3 SAC 구현체를 오버라이드 하여 replay buffer을 offline data로 초기화하고
+online training을 수행하기 위한 코드입니다. 
+
+"""
+
+
+
 import glob
 import os
 from typing import Optional
-
 import numpy as np
 import torch as th
 import torch.nn.functional as F
@@ -14,14 +21,14 @@ import pickle
 from datetime import datetime
 NOW = datetime.now().strftime("%Y%m%d_%H%M")
 
+
 class RunningMeanStd:
     def __init__(self, shape=None, eps=1e-4, device="cpu"):
+        
         """
-        shape:
-          - None  -> 스칼라(예: novelty 등)
-          - int   -> (D,)로 간주
-          - tuple -> 그대로
+        온라인으로 데이터의 평균과 분산을 업데이트하는 클래스입니다.
         """
+
         import torch as th
         self.device = th.device(device)
         if shape is None:
@@ -36,26 +43,20 @@ class RunningMeanStd:
 
     @th.no_grad()
     def update(self, x):
-        """
-        x: torch.Tensor 또는 np.ndarray
-           - 스칼라 모드(shape=None): (B,) 또는 (B,1)
-           - 벡터 모드(shape=(D,)):   (B, D)
-        """
+        """배치 데이터 x를 받아 mean, var, count를 갱신합니다."""
         import torch as th, numpy as np
         if not isinstance(x, th.Tensor):
             x = th.as_tensor(x, dtype=th.float32, device=self.device)
 
         if self.mean.ndim == 0:
-            # 스칼라 RMS (예: novelty)
-            x = x.view(-1)  # (B,)로
+            x = x.view(-1) 
             batch_mean = x.mean()
             batch_var  = x.var(unbiased=False)
             batch_count = x.shape[0]
         else:
-            # 차원별 RMS
-            x = x.to(self.device, dtype=th.float32)  # (B, D)
-            batch_mean = x.mean(dim=0)               # (D,)
-            batch_var  = x.var(dim=0, unbiased=False)# (D,)
+            x = x.to(self.device, dtype=th.float32)  
+            batch_mean = x.mean(dim=0)              
+            batch_var  = x.var(dim=0, unbiased=False)
             batch_count = x.shape[0]
 
         delta = batch_mean - self.mean
@@ -69,6 +70,7 @@ class RunningMeanStd:
         self.mean, self.var, self.count = new_mean, new_var, tot_count
 
     def normalize(self, x, eps=1e-8):
+        """현재까지의 통계치를 바탕으로 입력값 x를 정규화합니다."""
         import torch as th
         if not isinstance(x, th.Tensor):
             x = th.as_tensor(x, dtype=th.float32, device=self.device)
@@ -76,6 +78,9 @@ class RunningMeanStd:
 
 
 class SACOfflineOnline(SAC):
+    """
+    SB3 SAC를 상속받아 Offline data로 replay buffer을 초기화하여 사용하는 기능을 추가한 클래스입니다.
+    """
 
     def __init__(
         self,
@@ -134,72 +139,16 @@ class SACOfflineOnline(SAC):
         if isinstance(self.ent_coef, (int, float)):
             return th.tensor(float(self.ent_coef), device=self.device)
         return self.ent_coef_tensor  
-   
-    def compute_mc_returns(self, gamma: float, rewards: np.ndarray, dones: np.ndarray) -> np.ndarray:
-        mc = np.zeros_like(rewards, dtype=np.float32)
-        G = 0.0
-        for i in reversed(range(len(rewards))):
-            if bool(dones[i]):
-                G = float(rewards[i])
-            else:
-                G = float(rewards[i]) + gamma * G
-            mc[i] = G
-        return mc
 
-
-    def prefill_from_npz_folder(self, data_dir: str, clip_actions: bool = True) -> int:
-        self.mc_targets = [] 
-        files = sorted(glob.glob(os.path.join(data_dir, "route_6*.npz")))
-        if not files:
-            raise FileNotFoundError(f"No .npz files in {data_dir}")
-
-        act_low = getattr(self.action_space, "low", None)
-        act_high = getattr(self.action_space, "high", None)
-
-        n_added, n_files = 0, 0
-        all_rews = []
-        all_dones = []
-        for path in files:
-            with np.load(path, allow_pickle=False) as d:
-                obs = d["observations"].astype(np.float32)
-                acts = d["actions"].astype(np.float32)
-                rews = d["rewards"].astype(np.float32).reshape(-1, 1)
-                nobs = d["next_observations"].astype(np.float32)
-                dones = d["terminals"].astype(np.float32).reshape(-1, 1)
-
-            N = min(len(obs), len(acts), len(rews), len(nobs), len(dones))
-            if N == 0:
-                continue
-            obs, acts, rews, nobs, dones = obs[:N], acts[:N], rews[:N], nobs[:N], dones[:N]
-
-            if clip_actions and act_low is not None and act_high is not None:
-                acts = np.clip(acts, act_low, act_high)
-
-            for o, no, a, r, d in zip(obs, nobs, acts, rews, dones): 
-                self.replay_buffer.add(
-                    o[None, :],                           # (1, obs_dim)
-                    no[None, :],                          # (1, obs_dim)
-                    a[None, :],                           # (1, act_dim)
-                    np.array([float(r)], np.float32),     # (1,)
-                    np.array([bool(d)], np.float32),      # (1,)
-                    [{"TimeLimit.truncated": False}],     # info list 길이 = n_envs(=1)
-                )
-                all_rews.append(float(r))
-                all_dones.append(bool(d))
-                self.obs_rms.update(th.tensor(o).unsqueeze(0))  # shape (1, obs_dim)
-                self.act_rms.update(th.tensor(a).unsqueeze(0))  # shape (1, act_dim)
-            n_added += N
-            n_files += 1
-     
-        mc_returns = self.compute_mc_returns(
-            gamma=self.gamma,
-            rewards=np.array(all_rews),
-            dones=np.array(all_dones)
-        )
-        self.mc_targets = mc_returns.tolist()
-        return n_added
 
     def prefill_from_npz_folder_mclearn(self, data_dir: str, clip_actions: bool = True) -> int: 
+        """
+        인자로 오프라인 데이터 (.npz 형식) 가 들어있는 경로를 넣으면, 해당 경로에 있는 데이터로 replay buffer을 초기화합니다. 
+        
+        Args: 
+            data_dir : 데이터 경로 
+            
+        """
         self.mc_targets = [] 
         files = sorted(glob.glob(os.path.join(data_dir, "*.npz")))
         if not files:
@@ -238,7 +187,6 @@ class SACOfflineOnline(SAC):
                     [{"TimeLimit.truncated": False}],     # info list 길이 = n_envs(=1)
                 )
                 
-                
                 all_rews.append(float(r))
                 all_dones.append(bool(d))
                 
@@ -247,20 +195,15 @@ class SACOfflineOnline(SAC):
             n_added += N
             n_files += 1
 
-        mc_returns = self.compute_mc_returns(
-            gamma=self.gamma,
-            rewards=np.array(all_rews),
-            dones=np.array(all_dones)
-        )
-        self.mc_targets = mc_returns.tolist()
         return n_added
 
     def tstats(self, tensor: th.Tensor, name: str = "") -> str:
         """
-        텐서의 요약 통계를 문자열로 반환.
+        텐서의 요약 통계를 문자열로 반환하는 메서드입니다. 
+        
         Args:
-            tensor (th.Tensor): 통계를 출력할 텐서
-            name (str): 변수 이름(옵션)
+            tensor : 통계를 출력할 텐서
+            name : 변수 이름(옵션)
         Returns:
             str: 정리된 통계 문자열
         """
@@ -284,12 +227,13 @@ class SACOfflineOnline(SAC):
 
     def _nan_report(self, step: int, phase: str = "train", **tensors):
         """
-        텐서들 중 NaN이 있는지 탐지하고 있으면 관련 정보를 출력.
+        텐서들 중 NaN이 있는지 탐지하고 있으면 관련 정보를 출력하는 메서드입니다.
+        예전에 에러날 때 디버깅하려고 쓴 것이라 거의 쓸 일이 없으실 것 같습니다! 
 
         Args:
-            step (int): 현재 스텝 수
-            phase (str): 학습 단계 이름 (예: "train", "online", "pretrain" 등)
-            tensors (dict): 검사할 텐서들 (키=이름, 값=텐서)
+            step : 현재 스텝 수
+            phase : 학습 단계 이름 (예: "train", "online", "pretrain" 등)
+            tensors : 검사할 텐서들 (키=이름, 값=텐서)
         """
         for name, tensor in tensors.items():
             if not isinstance(tensor, th.Tensor):
@@ -305,27 +249,32 @@ class SACOfflineOnline(SAC):
     
     def _tick_log(self, step: int, interval: int, message: str):
         """
-        주어진 step이 interval의 배수일 때만 message를 출력하는 헬퍼 함수.
+        critic loss, actor loss 출력용 함수입니다.
+        이것도 예전에 학습이 자꾸 붕괴될 때 디버깅을 위해 사용한 것이라 쓰실 일이 없을 것 같습니다!
         
-        Args:
-            step (int): 현재 step 또는 업데이트 수
-            interval (int): 로그 출력 간격
-            message (str): 출력할 메시지
+        Args :
+            step : 현재 step 또는 업데이트 수
+            interval : 로그 출력 간격
+            message : 출력할 메시지
         """
         if step % interval == 0:
             print(message)
 
-    # 정책이 뽑은 행동 & 로그 확률 뽑기 
-    @th.no_grad()
-    def _actor_log_prob(self, obs: th.Tensor):
-        a, logp = self.policy.actor.action_log_prob(obs)
-        if logp.dim() == 1:
-            logp = logp.view(-1, 1)
-        return a, logp
+    # @th.no_grad()
+    # def _actor_log_prob(self, obs: th.Tensor):
+    #     """
+    #     현재 Actor 정책을 사용하여 행동과 로그 확률을 반환합니다. 
+    #     단순히 값 확인용으로 필요한 경우 사용하면 될 것 같습니다! 
+    #     """
+    #     a, logp = self.policy.actor.action_log_prob(obs)
+    #     if logp.dim() == 1:
+    #         logp = logp.view(-1, 1)
+    #     return a, logp
 
-    def train(self, gradient_steps: int, batch_size: int = 64) -> None:
 
-        # 학습 세팅 
+    def train(self, gradient_steps: int, batch_size: int = 256) -> None:
+        """ 학습 루프 부분입니다. """
+
         self.policy.set_training_mode(True)
         optimizers = [self.policy.actor.optimizer, self.policy.critic.optimizer]
         if self.ent_coef_optimizer is not None:
@@ -336,18 +285,18 @@ class SACOfflineOnline(SAC):
         for gradient_step in range(gradient_steps):
             global_update = self._n_updates + gradient_step
             
-            # 1. 리플레이 버퍼에서 배치를 뽑는다. 
+            """ 1. 리플레이 버퍼에서 배치를 뽑는다. """
             rb = self.replay_buffer
             size = rb.buffer_size if rb.full else rb.pos
             batch_inds = np.random.randint(0, size, size=batch_size)  
             replay_data = rb._get_samples(batch_inds)  
 
-            # Actor 출력값 
+            """ 2. Entropy 계수 자동 튜닝 """
             actions_pi, log_prob = self.policy.actor.action_log_prob(replay_data.observations)
             log_prob = log_prob.view(-1, 1)
             ent_coef_loss = None
             
-            # 엔트로피 계수 업데이트 
+            """ 엔트로피 계수 업데이트 """ 
             if self.ent_coef_optimizer is not None:
                 ent_coef = th.exp(self.log_ent_coef.detach())
                 ent_coef_loss = -(self.log_ent_coef * (log_prob + self.target_entropy).detach()).mean()  
@@ -360,7 +309,9 @@ class SACOfflineOnline(SAC):
                 ent_coef_loss.backward()
                 self.ent_coef_optimizer.step()
                 
+            """ 3. Critic 업데이트 """
             with th.no_grad():
+                """ Target Action & Q값 계산 """
                 next_actions, next_log_prob = self.policy.actor.action_log_prob(replay_data.next_observations)
                 next_q_values = th.cat(
                     self.policy.critic_target(replay_data.next_observations, next_actions), dim=1
@@ -369,7 +320,7 @@ class SACOfflineOnline(SAC):
                 target_q_sac = replay_data.rewards + (1.0 - replay_data.dones) * float(self.gamma) * (
                     next_q_values - ent_coef * next_log_prob.view(-1, 1)
                 )                
- 
+            """ 현재 Q값과 loss 계산 """
             current_q1, current_q2 = self.policy.critic(replay_data.observations, replay_data.actions)
             critic_loss = 0.5 * (F.mse_loss(current_q1, target_q_sac) + F.mse_loss(current_q2, target_q_sac))
             critic_losses.append(float(critic_loss.detach().cpu().numpy()))
@@ -378,7 +329,7 @@ class SACOfflineOnline(SAC):
             critic_loss.backward()
             self.policy.critic.optimizer.step()
 
-
+            """ 4. Actor 업데이트 """
             q1_pi, q2_pi = self.policy.critic(replay_data.observations, actions_pi) 
             min_q_pi = th.min(q1_pi, q2_pi)
 
@@ -386,7 +337,15 @@ class SACOfflineOnline(SAC):
                 deterministic_action = self.policy._predict(replay_data.observations, deterministic=True)
 
             self.q_rms.update(min_q_pi.detach()) 
-      
+
+            actor_loss = (ent_coef * log_prob - min_q_pi ).mean()
+            actor_losses.append(float(actor_loss.detach().cpu().numpy()))
+
+            self.policy.actor.optimizer.zero_grad()
+            actor_loss.backward()
+            self.policy.actor.optimizer.step()
+            
+            """ 로깅 """
             if global_update % 5000 == 0:
                 print(f"[Update {global_update}]")
                 print("q_pi:", self.tstats(min_q_pi, "q_pi"))
@@ -395,14 +354,8 @@ class SACOfflineOnline(SAC):
                 print("cal_q:", self.tstats(min_q_pi , "calibrated_q"))
                 print(f"cal_q_count:{self.calibrated}")
                 print("-" * 50)
-
-            actor_loss = (ent_coef * log_prob - min_q_pi ).mean()
-            actor_losses.append(float(actor_loss.detach().cpu().numpy()))
-
-            self.policy.actor.optimizer.zero_grad()
-            actor_loss.backward()
-            self.policy.actor.optimizer.step()
-
+            
+            """ 타깃 네트워크(Critic) 업데이트  """
             if global_update % self.target_update_interval == 0:
                 polyak_update(self.policy.critic.parameters(), self.policy.critic_target.parameters(), self.tau)
 

@@ -15,6 +15,10 @@ from datetime import datetime
 NOW = datetime.now().strftime("%Y%m%d_%H%M")
 
 class MCNet(nn.Module):
+    """
+    상태와 행동을 입력받아 에피소드의 몬테 카를로 리턴을 예측하는 모델입니다. 
+    Offline 데이터로 지도 학습을 수행하여 학습됩니다. 
+    """
     def __init__(self, input_dim: int, hidden_dims=[256, 256]):
         super().__init__()
         layers = []
@@ -23,7 +27,7 @@ class MCNet(nn.Module):
         for i in range(len(dims) - 1):
             layers += [nn.Linear(dims[i], dims[i+1]), nn.ReLU()]
         
-        layers.append(nn.Linear(dims[-1], 1))  # output: MC return
+        layers.append(nn.Linear(dims[-1], 1))  
         self.model = nn.Sequential(*layers)
         self.optimizer = th.optim.Adam(self.parameters(), lr=3e-4)
 
@@ -34,10 +38,7 @@ class MCNet(nn.Module):
 class RunningMeanStd:
     def __init__(self, shape=None, eps=1e-4, device="cpu"):
         """
-        shape:
-          - None  -> 스칼라(예: novelty 등)
-          - int   -> (D,)로 간주
-          - tuple -> 그대로
+        온라인으로 데이터의 평균과 분산을 업데이트하는 클래스입니다.
         """
         import torch as th
         self.device = th.device(device)
@@ -54,25 +55,21 @@ class RunningMeanStd:
     @th.no_grad()
     def update(self, x):
         """
-        x: torch.Tensor 또는 np.ndarray
-           - 스칼라 모드(shape=None): (B,) 또는 (B,1)
-           - 벡터 모드(shape=(D,)):   (B, D)
+        배치 데이터 x를 받아 mean, var, count를 갱신합니다.
         """
         import torch as th, numpy as np
         if not isinstance(x, th.Tensor):
             x = th.as_tensor(x, dtype=th.float32, device=self.device)
 
         if self.mean.ndim == 0:
-            # 스칼라 RMS (예: novelty)
-            x = x.view(-1)  # (B,)로
+            x = x.view(-1)  
             batch_mean = x.mean()
             batch_var  = x.var(unbiased=False)
             batch_count = x.shape[0]
         else:
-            # 차원별 RMS
-            x = x.to(self.device, dtype=th.float32)  # (B, D)
-            batch_mean = x.mean(dim=0)               # (D,)
-            batch_var  = x.var(dim=0, unbiased=False)# (D,)
+            x = x.to(self.device, dtype=th.float32)  
+            batch_mean = x.mean(dim=0)              
+            batch_var  = x.var(dim=0, unbiased=False)
             batch_count = x.shape[0]
 
         delta = batch_mean - self.mean
@@ -86,73 +83,77 @@ class RunningMeanStd:
         self.mean, self.var, self.count = new_mean, new_var, tot_count
 
     def normalize(self, x, eps=1e-8):
+        """현재까지의 통계치를 바탕으로 입력값 x를 정규화합니다."""
         import torch as th
         if not isinstance(x, th.Tensor):
             x = th.as_tensor(x, dtype=th.float32, device=self.device)
         return (x.to(self.device, dtype=th.float32) - self.mean) / th.sqrt(self.var + eps)
 
 
-class SACOfflineOnline(SAC): # SAC 상속한 커스텀 에이전트 
+class SACOfflineOnline(SAC): 
+    """ 
+    SB3의 SAC를 상속받아 제안 기법을 추가한 코드입니다.
+    아래와 같은 부분이 포함되어 있습니다. 
+    
+    - offline data로 replay buffer 초기화 
+    - MCNet (Monte carlo return 근사 네트워크) 학습
+    - Random Network Distillation 으로 novelty 도출 및 보정 가중치로 이용
+    """
 
     def __init__(
         self,
-        env, # 학습 환경 
+        env, 
         policy: str = "MlpPolicy", 
         learning_starts: int = 0, 
         target_entropy = -3,
         **sac_kwargs,
     ):
+        # SAC 기본 설정
         if "learning_starts" not in sac_kwargs:
             sac_kwargs["learning_starts"] = learning_starts
 
         super().__init__(policy, env, target_entropy=target_entropy, **sac_kwargs) 
         print(f"target entropy : {target_entropy}")
         
-        self.rnd = None # rnd 모듈 정의 
-        self.rnd_update_every = 5
-        self.rnd_update_steps = 1
         self.device = th.device("cuda" if th.cuda.is_available() else "cpu")
         print(self.device)
-        # 몬테 카를로 return 캐시를 위한 변수 
-        self._mc_cached_size: int = -1  # 유효 버퍼 길이 
+        
+        # RND , MCNet 관련 설정 
+        self.rnd = None 
+        self.rnd_update_every = 5
+        self.rnd_update_steps = 1
+        
+        # MC 리턴 계산을 위한 캐싱 변수 
+        self._mc_cached_size: int = -1  
         self._mc_cached_pos  = -1
         self._mc_cached_full = False
+        
+        # 초기값만 0.5로 설정, 이후는 auto로 튜닝 
         self.ent_coef = 0.5
+        
+        # MCNet 모델 초기화 
         self.mc_targets = []
         self.mcnet = MCNet(input_dim=self.observation_space.shape[0] + self.action_space.shape[0]).to(self.device)
-        # checkpoint = th.load("mcnet/mcnet_pretrained.pth")
-        # self.mcnet.load_state_dict(checkpoint["model_state_dict"])
-        # self.mcnet.optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
-
         
+        # 정규화 객체 초기화 
         obs_dim = self.observation_space.shape[0]
         act_dim = self.action_space.shape[0]
 
-        self._nov_rms = RunningMeanStd(shape=None, device=self.device)   # 스칼라 RMS (novelty)
-        self.obs_rms  = RunningMeanStd(shape=obs_dim, device=self.device) # 차원별 RMS
-        self.act_rms  = RunningMeanStd(shape=act_dim, device=self.device) # 차원별 RMS
+        self._nov_rms = RunningMeanStd(shape=None, device=self.device)  
+        self.obs_rms  = RunningMeanStd(shape=obs_dim, device=self.device) 
+        self.act_rms  = RunningMeanStd(shape=act_dim, device=self.device) 
            
-        self.q_rms = RunningMeanStd(shape=None, device=self.device)  # Q 통계 (스칼라)
-        self.g_rms = RunningMeanStd(shape=None, device=self.device)  # MCNet 통계 (스칼라)
+        self.q_rms = RunningMeanStd(shape=None, device=self.device) 
+        self.g_rms = RunningMeanStd(shape=None, device=self.device)  
 
         self.gamma = 0.99
 
+        # 얼마나 보정되었는지 셀 용도로 만든 카운터입니다 
         self.calibrated = 0
-   
 
-    def load_mcnet(self, path: str):
-        ckpt = th.load(path, map_location=self.device)
-        self.mcnet.load_state_dict(ckpt["mcnet"])
-        if "mcnet_opt" in ckpt:
-            self.mcnet.optimizer.load_state_dict(ckpt["mcnet_opt"])
-        for name, rms in [("obs_rms", self.obs_rms), ("act_rms", self.act_rms)]:
-            rms.mean  = ckpt[name]["mean"].to(self.device)
-            rms.var   = ckpt[name]["var"].to(self.device)
-            rms.count = ckpt[name]["count"].to(self.device)
-        print(f"[MCNet] Loaded from {path}")
-
-
-    def _alpha(self) -> th.Tensor: # 현재 엔트로피 계수 얻기 
+    
+    def _alpha(self) -> th.Tensor: 
+        """ 현재 엔트로피 계수 얻는 메서드 """
         if self.ent_coef_optimizer is not None:
             with th.no_grad():
                 return self.log_ent_coef.exp().detach() 
@@ -160,8 +161,15 @@ class SACOfflineOnline(SAC): # SAC 상속한 커스텀 에이전트
             return th.tensor(float(self.ent_coef), device=self.device)
         return self.ent_coef_tensor  
    
-    # 몬테 카를로 리턴 계산
+    
     def compute_mc_returns(self, gamma: float, rewards: np.ndarray, dones: np.ndarray) -> np.ndarray:
+        """ 
+            몬테 카를로 리턴을 계산하는 메서드 
+            
+            Args : 
+                rewards : offline data 안에 있는 reward값이 저장된 array
+                dones : 에피소드 종료 지점 여부  
+        """
         mc = np.zeros_like(rewards, dtype=np.float32)
         G = 0.0
         for i in reversed(range(len(rewards))):
@@ -173,12 +181,23 @@ class SACOfflineOnline(SAC): # SAC 상속한 커스텀 에이전트
         return mc
 
     def attach_rnd(self, rnd) -> None:
+        """
+        RND 모듈 연결하는 메서드 
+        online learn 시작하기 전에 꼭 호출해야 합니다. 
+        """
         self.rnd = rnd
         self.rnd.device = str(self.device)
         self._mc_returns = None
         self._mc_cached_size = -1
 
+
     def prefill_from_npz_folder_mclearn(self, data_dir: str, clip_actions: bool = True) -> int: 
+        """
+        data_dir 경로에 있는 offline data (.npz 형식의 파일) 들을 로드하여 replay buffer을 초기화하는 메서드입니다. 
+        
+        Args : 
+            data_dir : offline data가 저장된 경로 
+        """
         self.mc_targets = [] 
         files = sorted(glob.glob(os.path.join(data_dir, "*.npz")))
         if not files:
@@ -207,22 +226,21 @@ class SACOfflineOnline(SAC): # SAC 상속한 커스텀 에이전트
             if clip_actions and act_low is not None and act_high is not None:
                 acts = np.clip(acts, act_low, act_high)
 
-            for o, no, a, r, d in zip(obs, nobs, acts, rews, dones): # 전이 하나씩 삽입이라는데 
+            for o, no, a, r, d in zip(obs, nobs, acts, rews, dones): 
                 self.replay_buffer.add(
-                    o[None, :],                           # (1, obs_dim)
-                    no[None, :],                          # (1, obs_dim)
-                    a[None, :],                           # (1, act_dim)
-                    np.array([float(r)], np.float32),     # (1,)
-                    np.array([bool(d)], np.float32),      # (1,)
-                    [{"TimeLimit.truncated": False}],     # info list 길이 = n_envs(=1)
+                    o[None, :],                          
+                    no[None, :],                         
+                    a[None, :],                          
+                    np.array([float(r)], np.float32),     
+                    np.array([bool(d)], np.float32),     
+                    [{"TimeLimit.truncated": False}],    
                 )
-                
                 
                 all_rews.append(float(r))
                 all_dones.append(bool(d))
                 
-                self.obs_rms.update(th.tensor(o).unsqueeze(0))  # shape (1, obs_dim)
-                self.act_rms.update(th.tensor(a).unsqueeze(0))  # shape (1, act_dim)
+                self.obs_rms.update(th.tensor(o).unsqueeze(0)) 
+                self.act_rms.update(th.tensor(a).unsqueeze(0))  
             n_added += N
             n_files += 1
 
@@ -234,8 +252,9 @@ class SACOfflineOnline(SAC): # SAC 상속한 커스텀 에이전트
         self.mc_targets = mc_returns.tolist()
         return n_added
 
-    # 리플레이 버퍼 안에 있는 값들 중 observations 만 가져와서 학습함 
+  
     def update_rnd_with_critic_batch(self, batch: ReplayBufferSamples) -> th.Tensor:
+        """현재 배치 안에 있는 데이터를 사용하여 RND 네트워크를 업데이트하는 메서드입니다."""
         if self.rnd is None:
             raise RuntimeError("RND is not attached. Call attach_rnd(rnd) first.")
 
@@ -253,11 +272,14 @@ class SACOfflineOnline(SAC): # SAC 상속한 커스텀 에이전트
 
 
     def train_mcnet_from_buffer(self, epochs=5, batch_size=512):
+        """
+        Replay Buffer의 상태(obs), 행동(act)과 replay buffer을 offline data로 초기화할 때 (prefill_from_npz_folder_mclearn 메서드에서) 계산해둔 몬테 카를로 리턴을 사용하여 MCNet 학습을 수행합니다. 
+        """
         self.mcnet.train()
         dataset_size = len(self.mc_targets)
-        # print(f"dataset size : {dataset_size}")
+        
         buffer_len = self.replay_buffer.pos if not self.replay_buffer.full else self.replay_buffer.buffer_size
-        # print(f"buffer len : {buffer_len}")
+
         assert dataset_size == buffer_len, f"mc_targets size mismatch ({dataset_size} vs {buffer_len})"
 
         for epoch in range(epochs):
@@ -266,9 +288,7 @@ class SACOfflineOnline(SAC): # SAC 상속한 커스텀 에이전트
                 idxs = perm[i:i + batch_size]
 
                 target = th.tensor(np.array(self.mc_targets)[idxs], dtype=th.float32).unsqueeze(-1).to(self.device)
-                # print("obs.shape:", obs.shape)
-                # print("act.shape:", act.shape)
-                # print("target.shape:", target.shape)
+             
                 obs = self.replay_buffer.observations[idxs].squeeze(1)  
                 act = self.replay_buffer.actions[idxs].squeeze(1)
 
@@ -286,62 +306,16 @@ class SACOfflineOnline(SAC): # SAC 상속한 커스텀 에이전트
                     p = pred[:5].detach().squeeze(-1).cpu().numpy()   # 앞 5개만
                     t = target[:5].detach().squeeze(-1).cpu().numpy()
 
-                    # 요약 통계 + 일부 샘플만 보여주자 (훈련 느려지지 않게)
-                    # print(
-                    #     f"[MCNet] i={i:06d} | "
-                    #     f"loss={loss.item():.4f} | "
-                    #     f"pred[:5]={np.round(p, 3)} | "
-                    #     f"targ[:5]={np.round(t, 3)} | "
-                    #     f"pμ={pred.mean().item():.3f} p_sigma={pred.std().item():.3f} | "
-                    #     f"tμ={target.mean().item():.3f} t_sigma={target.std().item():.3f} | "
-                    #     f"shape p={tuple(pred.shape)} t={tuple(target.shape)}"
-                    # )
-
                 self.mcnet.optimizer.zero_grad()
                 loss.backward()
                 self.mcnet.optimizer.step()
 
             print(f"[MCNet] Epoch {epoch+1}/{epochs} | Loss: {loss.item():.4f}")
             
-            
-    def save_mcnet_pth(self, path="mcnet_pretrained.pth"):
-        os.makedirs(os.path.dirname(path) or ".", exist_ok=True)  # 폴더 없으면 자동 생성
-        th.save({
-            "mcnet": self.mcnet.state_dict(),
-            "mcnet_opt": self.mcnet.optimizer.state_dict(),
-            "obs_rms": {
-                "mean": self.obs_rms.mean,
-                "var": self.obs_rms.var,
-                "count": self.obs_rms.count
-            },
-            "act_rms": {
-                "mean": self.act_rms.mean,
-                "var": self.act_rms.var,
-                "count": self.act_rms.count
-            },
-            "cfg": {
-                "input_dim": self.mcnet.model[0].in_features,
-                "hidden_dims": [256, 256]
-            }
-        }, path)
-        print(f"[MCNet] Saved as PyTorch .pth at {path}")
-
-        
-
-    def save_mcnet_pickle(self, path="mcnet_pretrained.pkl"):
-        with open(path, 'wb') as f:
-            pickle.dump(self.mcnet, f)
-        print(f"[MCNet] Saved as Pickle .pkl at {path}")
-        
 
     def tstats(self, tensor: th.Tensor, name: str = "") -> str:
         """
-        텐서의 요약 통계를 문자열로 반환.
-        Args:
-            tensor (th.Tensor): 통계를 출력할 텐서
-            name (str): 변수 이름(옵션)
-        Returns:
-            str: 정리된 통계 문자열
+        텐서의 요약 통계를 문자열로 반환하는 메서드입니다.
         """
         if not isinstance(tensor, th.Tensor):
             return f"{name}: Not a tensor"
@@ -363,12 +337,8 @@ class SACOfflineOnline(SAC): # SAC 상속한 커스텀 에이전트
 
     def _nan_report(self, step: int, phase: str = "train", **tensors):
         """
-        텐서들 중 NaN이 있는지 탐지하고 있으면 관련 정보를 출력.
-
-        Args:
-            step (int): 현재 스텝 수
-            phase (str): 학습 단계 이름 (예: "train", "online", "pretrain" 등)
-            tensors (dict): 검사할 텐서들 (키=이름, 값=텐서)
+        텐서들 중 NaN이 있는지 탐지하고 있으면 관련 정보를 출력합니다.
+        옛날에 디버깅할 때 사용한 코드라 사용하실 일은 없을 것 같습니다!! 
         """
         for name, tensor in tensors.items():
             if not isinstance(tensor, th.Tensor):
@@ -384,118 +354,142 @@ class SACOfflineOnline(SAC): # SAC 상속한 커스텀 에이전트
     
     def _tick_log(self, step: int, interval: int, message: str):
         """
-        주어진 step이 interval의 배수일 때만 message를 출력하는 헬퍼 함수.
+        critic loss, actor loss 출력용 함수입니다.
+        예전에 학습이 자꾸 붕괴될 때 디버깅을 위해 사용한 것이라 쓰실 일이 없을 것 같습니다!
         
-        Args:
-            step (int): 현재 step 또는 업데이트 수
-            interval (int): 로그 출력 간격
-            message (str): 출력할 메시지
+        Args :
+            step : 현재 step 또는 업데이트 수
+            interval : 로그 출력 간격
+            message : 출력할 메시지
         """
         if step % interval == 0:
             print(message)
 
-    # 정책이 뽑은 행동 & 로그 확률 뽑기 
-    @th.no_grad()
-    def _actor_log_prob(self, obs: th.Tensor):
-        a, logp = self.policy.actor.action_log_prob(obs)
-        if logp.dim() == 1:
-            logp = logp.view(-1, 1)
-        return a, logp
+  
+    # @th.no_grad()
+    # def _actor_log_prob(self, obs: th.Tensor):
+    #     """
+    #     현재 Actor 정책을 사용하여 행동과 로그 확률을 반환합니다. 
+    #     단순히 값 확인용으로 필요한 경우 사용하면 될 것 같습니다! 
+    #     """
+    #     a, logp = self.policy.actor.action_log_prob(obs)
+    #     if logp.dim() == 1:
+    #         logp = logp.view(-1, 1)
+    #     return a, logp
 
 
 
     def train(self, gradient_steps: int, batch_size: int = 64) -> None:
-
-        # 학습 세팅 
+        """ 제안 기법 학습 루프를 구현한 부분입니다. """
+        
+        # 학습 세팅 (옵티마이저 설정)
         self.policy.set_training_mode(True)
         optimizers = [self.policy.actor.optimizer, self.policy.critic.optimizer]
         if self.ent_coef_optimizer is not None:
             optimizers.append(self.ent_coef_optimizer)
         self._update_learning_rate(optimizers)
+        
+        # 로깅을 하기 위한 리스트 정의 
         ent_coef_losses, ent_coefs = [], []
         actor_losses, critic_losses = [], []
+        
         for gradient_step in range(gradient_steps):
             global_update = self._n_updates + gradient_step
             
-            # 1. 리플레이 버퍼에서 배치를 뽑는다. 
+            """ 1. replay buffer에서 데이터를 샘플링합니다. """
             rb = self.replay_buffer
             size = rb.buffer_size if rb.full else rb.pos
             batch_inds = np.random.randint(0, size, size=batch_size)  
             replay_data = rb._get_samples(batch_inds)  
 
-            # Actor 출력값 
+            """ 2. entropy 계수를 업데이트 합니다. """
+            # 현재 정책의 행동과 log propbability를 계산합니다. 
             actions_pi, log_prob = self.policy.actor.action_log_prob(replay_data.observations)
             log_prob = log_prob.view(-1, 1)
+            
             ent_coef_loss = None
             
-            # 엔트로피 계수 업데이트 
+            # 설정된 Target Entropy를 유지하도록 자동으로 alpha 값을 조절합니다. 
             if self.ent_coef_optimizer is not None:
                 ent_coef = th.exp(self.log_ent_coef.detach())
-                ent_coef_loss = -(self.log_ent_coef * (log_prob + self.target_entropy).detach()).mean()  # 수정: 이중 detach 제거
+                ent_coef_loss = -(self.log_ent_coef * (log_prob + self.target_entropy).detach()).mean()  
                 ent_coef_losses.append(ent_coef_loss.item())
             else:
                 ent_coef = self.ent_coef_tensor
             ent_coefs.append(float(ent_coef.detach().cpu().numpy()))
+            
+            
             if ent_coef_loss is not None:
                 self.ent_coef_optimizer.zero_grad()
                 ent_coef_loss.backward()
                 self.ent_coef_optimizer.step()
                 
+                
+            """ 3. RND 네트워크를 업데이트 합니다. """
             if self.rnd is None:
                 raise RuntimeError("RND is not attached. Call attach_rnd(rnd) before learn().")  
-            
+            # Critic 업데이트에 사용된 배치로 RND 내부 신경망도 똑같이 학습합니다. 
             self.update_rnd_with_critic_batch(replay_data)
             
-            # target Q값 계산 
+            """ 4. Critic 네트워크를 업데이트합니다. """
             with th.no_grad():
+                
+                # [Critic 업데이트 1] 다음 상태에서의 행동과 Q값을 예측합니다. 
                 next_actions, next_log_prob = self.policy.actor.action_log_prob(replay_data.next_observations)
                 next_q_values = th.cat(
                     self.policy.critic_target(replay_data.next_observations, next_actions), dim=1
                 )
                 next_q_values, _ = th.min(next_q_values, dim=1, keepdim=True)
+                
+                # [Critic 업데이트 2] Q-learning target을 계산합니다. 
                 target_q_sac = replay_data.rewards + (1.0 - replay_data.dones) * float(self.gamma) * (
                     next_q_values - ent_coef * next_log_prob.view(-1, 1)
                 )                
- 
-                obs_n = self.obs_rms.normalize(replay_data.observations)  # (B, D)
-                act_n = self.act_rms.normalize(replay_data.actions)       # (B, A)
+                
+                """ obs, action을 정규화하여 RND에 입력으로 넣어 novelty를 계산합니다. -> 이것이 얼마나 보정할 지 결정하는 가중치가 됩니다. """
+                obs_n = self.obs_rms.normalize(replay_data.observations)  
+                act_n = self.act_rms.normalize(replay_data.actions)       
                 mc_in = th.cat([obs_n, act_n], dim=1)
-                                
                 nov = self.rnd.novelty(mc_in) 
                 self._nov_rms.update(nov.detach().cpu().numpy())
                 mean_t = th.tensor(self._nov_rms.mean, device=self.device)
                 std_t  = th.tensor(self._nov_rms.var ** 0.5, device=self.device)
                 nov_z = (nov - mean_t) / (std_t + 1e-6)
-                rnd_norm = nov_z.sigmoid()
-       
                 w = th.sigmoid(nov_z.abs() - 1.0) 
                 w = w * 0.9                      
              
-
+            # [Critic 업데이트 3] Critic loss를 계산합니다. 
             current_q1, current_q2 = self.policy.critic(replay_data.observations, replay_data.actions)
             critic_loss = 0.5 * (F.mse_loss(current_q1, target_q_sac) + F.mse_loss(current_q2, target_q_sac))
             critic_losses.append(float(critic_loss.detach().cpu().numpy()))
 
+            # [Critic 업데이트 4] 계산한 loss를 이용해 업데이트 합니다. 
             self.policy.critic.optimizer.zero_grad()
             critic_loss.backward()
             self.policy.critic.optimizer.step()
 
-
+            """ 5. Actor loss에 들어가는 Q 값을 보정합니다. """
+            
+            # [Calibration 1] 두개의 Q값중 최솟값을 구합니다. 
             q1_pi, q2_pi = self.policy.critic(replay_data.observations, actions_pi) 
             min_q_pi = th.min(q1_pi, q2_pi)
 
             with th.no_grad():
                 deterministic_action = self.policy._predict(replay_data.observations, deterministic=True)
 
+            # [Calibration 2] 정규화된 observation, action을 이용하여 몬테 카를로 근사 값을 구합니다. 
             obs_n = self.obs_rms.normalize(replay_data.observations)
             act_n = self.act_rms.normalize(deterministic_action)
             g_pi = self.mcnet(th.cat([obs_n, act_n], dim=1)).detach()
             
-            
+            # 몇개의 Q값이 보정된건지 카운트하여 보정 기법이 작동하는지, 필요한지 체크합니다. 
             cali_q = th.minimum(g_pi,min_q_pi)
             mask = (g_pi < min_q_pi)
             self.calibrated += int(mask.sum().item())
        
+            # Q값 보정 부분 
+            # 수식 : (1-w) * 원래 Q값 + w * 몬테 카를로 근사 값 
+            # w (novelty) 가 클수록 몬테 카를로 근사 값으로 보정하는 비중을 높입니다 
             w = w.detach()
             if w.dim() == 1:
                 w = w.view(-1, 1)

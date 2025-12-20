@@ -21,3 +21,6 @@ figs/
 TEST_일반화실험_Town03_to_Town01/
 TEST_일반화실험_Town03_to_Town04/
 __pycache__/
+town04/
+sac_4.txt 
+sac_5.txt

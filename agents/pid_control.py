@@ -125,7 +125,7 @@ def compute_reward(obs, vehicle, collided=False, reached=False):
     speed_vec = vehicle.get_velocity()
     speed = np.linalg.norm([speed_vec.x, speed_vec.y, speed_vec.z])
 
-    # [변경됨] 논문 방식의 보상 함수
+    # 보상 함수 
     reward = abs(speed * np.cos(heading_error)) -  abs(speed * np.sin(heading_error)) -  abs(speed * lateral_error) 
 
     if collided:
