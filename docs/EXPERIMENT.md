@@ -8,12 +8,12 @@
 
 ## 1. 실험 진행 상황 
 
-### 1-1. Town03 학습 완료 (Base Environment)
+### 1-1. Town03 모델 학습 및 저장 완료 
 Town03 환경에서 제안 기법 및 베이스라인 모델(CQL, SAC, AWAC)에 대한 학습을 완료했습니다.
 * **실험 횟수:** 각 모델별 6 seed 수행
-* **저장 경로:** `logs/TOWN03_학습모델_로그/` (로그 및 모델 파일 포함)
+* **저장 경로:** `logs/TOWN03_학습모델_로그_저장된모델` (로그 및 모델 포함)
 
-### 1-2. 일반화 성능 실험 진행도 (Checklist)
+### 1-2. 일반화 성능 실험 진행도 
 현재 **Town01 ~ Town05** 환경에서의 일반화 성능 검증을 목표로 하고 있습니다. 진행 상황은 아래와 같습니다.
 
 | 환경 (Map) | 제안 기법 (Ours) | SAC | CQL | AWAC | 비고 |
@@ -25,11 +25,12 @@ Town03 환경에서 제안 기법 및 베이스라인 모델(CQL, SAC, AWAC)에 
 
 각 저장된 모델 별로 50 에피소드씩 주행을 수행하도록 하고 있습니다. 
 나머지 기법에 대해 마저 실험이 필요합니다. 
-아래의 두 코드를 실행하면 나머지 실험이 실행되도록 설정해 두었습니다. 
+**아래의 두 코드를 실행하면 나머지 일반화 성능 검증 실험이 실행되도록 설정해 두었습니다.**
 
+```bash
 - evaluate_sac_and_proposed.py 
 - evaluate_cql_awac.py
-
+```
 ---
 
 ### 1-3. Town04 실험 관련 변경, 문제 사항 
@@ -45,8 +46,14 @@ Town03 환경에서 제안 기법 및 베이스라인 모델(CQL, SAC, AWAC)에 
 **[데이터셋 경로 안내]**
 Town04에서 수집한 Offline Dataset은 두 가지가 있습니다. 
 기존 데이터셋은 경로 이미지만 있고 제가 경로를 생성할 때 랜덤으로 출발지점을 생성하여 구체적으로 출발 지점의 좌표를 모르는 문제가 있습니다.
-따라서 새 데이터셋을 생성하여 현재 문서 아래에 각 경로를 생성할 때 설정한 경로 출발지점의 좌표를 적어두었습니다. 
-따라서 둘 중 사용하시기 조금 더 용이하신것으로 사용해 주시면 감사드리겠습니다.
+따라서 새 데이터셋을 생성하여 현재 문서 아래에 각 경로를 생성할 때 설정한 경로 출발지점의 좌표를 적어두었습니다. 둘 중 사용하시기 조금 더 용이하신것으로 사용해 주시면 감사드리겠습니다!
+
+dataset_town04_2 에서는 각 route마다 216개의 주행 trajectory가 저장되어 있습니다(.npz 형식)
+하나의 .npz 파일 길이가 town03보다 약 2배 이상 차이가 나서 216개씩 수집했습니다.
+
+만약, 추가 수집을 원한다면 `run.py` 파일의 **pid_control** 메서드의 **param_combinations** 부분에 조합을 더 추가하고 실행하면 추가로 수집할 수 있습니다. 
+
+제 생각에는 새로 수집한 데이터셋(dataset_town04_2) 으로 replay buffer을 초기화하고 한번 학습을 해보는 것도 좋을 것 같습니다. `offline_data_for_replaybuffer/Town04_2_offline_data_경로` 에서 수집된 데이터의 그림을 보면 새로 수집한 경로가 좀 더 예쁘게 수집된 느낌이 있기 때문입니다! 
 
 1.  **기존 데이터셋:** `offline_data_for_replaybuffer/dataset_town04`
 2.  **새로 생성한 데이터셋:** `offline_data_for_replaybuffer/dataset_town04_2`
@@ -60,13 +67,13 @@ Town04에서 수집한 Offline Dataset은 두 가지가 있습니다.
 **[!!중요] 경로 설정 확인**
 실험 시작 전, 각 모델 학습 파일의 `DATA_DIR` 경로가 현재 학습을 진행하고자 하는 Town의 Offline Data가 저장된 경로와 일치하는지 확인해야 합니다 
 
-* **DATA_DIR 예시**: `offline_data_for_replaybuffer/dataset_town04`
+* **DATA_DIR 예시**: `offline_data_for_replaybuffer/dataset_town04_2`
 * **LOGGING 경로 예시**: `SIMULATION = "TOWN4_제안기법_..."`
 
 
 ---
 
-### 2-2. Town04에서 제안기법과 타 베이스라인 학습 실행 (Training)
+### 2-2. Town04에서 제안기법과 타 베이스라인 학습 실행 
 
 *각 알고리즘별 6회 반복 실행*
 
@@ -99,7 +106,6 @@ python run_sac.py 300 -100 Town04
 
 ```bash
 python run_sac.py 300 -100 Town04
-
 ```
 
 #### 4. AWAC
@@ -157,7 +163,7 @@ ROOT_DIR   = "result/final_result_town3"
 OUTPUT_DIR = os.path.join(ROOT_DIR, "plots")
 ```
 
-그리고 위의 파일을 실행하면 result/final_result_town3/plots 폴더 안에 plot이 생성되어 저장됩니다. 
+그리고 위의 파일을 실행하면 (위에서 설정한 대로 경로 지정 시) result/final_result_town3/plots 폴더 안에 plot이 생성되어 저장됩니다. 
 
 
 #### 3. done_reached, done_collided plot 그리기
@@ -177,7 +183,7 @@ OUTPUT_DIR = os.path.join(ROOT_DIR, "plots")
 
 
 
-### 2-4. 저장된 모델 로드 및 테스트 (Evaluation)
+# 2. Town04 일반화 실험 : 저장된 모델 로드 및 테스트
 
 #### 타운별 테스트 시 주행 시작 포인트 (Start Points)
 
@@ -222,7 +228,7 @@ if __name__ == "__main__":
 if __name__ == "__main__":
     
     # town과 시작 지점 설정 
-    current_town = "Town04"
+    current_town = "{테스트할 타운 (Town01/Town02/Town03/Town04/Town05)}"
     start_pos = (300, -100)  
 
     test(
