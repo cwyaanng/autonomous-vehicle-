@@ -14,31 +14,31 @@ import matplotlib.pyplot as plt
 ROOT_DIR   = "result/final_result_town3"       
 OUTPUT_DIR = os.path.join(ROOT_DIR, "plots")
 
-# 그래프 설정
+
 SMOOTH_WINDOW = 100
 X_GAMMA = 1.5
 X_GRID = np.linspace(0.0, 100.0, 201)
 
-# Waypoint 정규화 범위 (Town03: ~930, Town04: 맵 길이에 맞춰 수정 필요)
 WAYPOINT_MIN = 0.0
-WAYPOINT_MAX = 930.0 
 
-# 알고리즘별 색상 (MCAC 제거됨)
+"""!! Town에 맞게 변경 필요!! """
+WAYPOINT_MAX = 930
+
+
 COLOR_MAP = {
-    "Proposed": "#d95f02", # Orange
-    "CQL":      "#36128b", # Purple
-    "AWAC":     "#17becf", # Cyan
-    "SAC":      "#3ccd10", # Green
+    "Proposed": "#d95f02", 
+    "CQL":      "#36128b", 
+    "AWAC":     "#17becf", 
+    "SAC":      "#3ccd10", 
 }
 
 LINEWIDTH_MEAN = 4.0
 ALPHA_BAND     = 0.10
 
-# 결과 저장 폴더 생성
+
 Path(OUTPUT_DIR).mkdir(parents=True, exist_ok=True)
 
 
-# -------------------- DATA PROCESSING HELPERS --------------------
 def moving_average(y, window=100):
     """데이터 스무딩 (이동 평균)"""
     s = pd.Series(y, dtype=float)
@@ -53,7 +53,7 @@ def to_progress_percent(step):
     return (x - lo) / (hi - lo) * 100.0
 
 def warp_percent(pct, gamma=2.0):
-    """X축(진행률) 왜곡 보정 (학습 후반부를 더 넓게 보기 위함)"""
+    """X축 진행률 왜곡 보정 -> 학습 후반부를 더 넓게 보기 위해 """
     p = np.clip(np.asarray(pct, dtype=float), 0.0, 100.0)
     return (p / 100.0) ** gamma * 100.0
 
@@ -77,9 +77,9 @@ def load_tensorboard_csv(path):
         try:
             df = pd.read_csv(path, encoding="cp949")
         except:
-            return pd.DataFrame() # 로드 실패 시 빈 DF 반환
-
+            return pd.DataFrame() 
     cols = {c.lower(): c for c in df.columns}
+    
     if "step" in cols and "value" in cols:
         df = df[[cols["step"], cols["value"]]].rename(columns={cols["step"]: "Step", cols["value"]: "Value"})
     else:
@@ -152,9 +152,8 @@ def aggregate_runs(runs, target_algo):
     return np.nanmean(Y, axis=0), np.nanstd(Y, axis=0)
 
 
-# -------------------- FILE LOADING --------------------
 root = Path(ROOT_DIR)
-exp_re = re.compile(r"(\d+)\s*차") # '{n}차' 패턴 확인용
+exp_re = re.compile(r"(\d+)\s*차") 
 
 def get_algo_name(filename):
     """파일명에서 알고리즘 이름 추출 (MCAC 제외)"""
@@ -169,7 +168,7 @@ def is_valid_run(path):
     """파일명에 '{n}차'가 포함되어 있는지 확인"""
     return exp_re.search(str(path)) is not None
 
-# 파일 경로 수집
+
 waypoint_files  = sorted(glob.glob(str(root / "waypoint_ahead" / "*.csv")))
 collision_files = sorted(glob.glob(str(root / "done_collided" / "*.csv")))
 reached_files   = sorted(glob.glob(str(root / "done_reached" / "*.csv")))
@@ -180,7 +179,7 @@ scalar_reached_runs = []
 
 print(f"Loading data from: {ROOT_DIR} ...")
 
-# 1. Waypoint Data Load
+
 for f in waypoint_files:
     if not is_valid_run(f): continue
     label = get_algo_name(Path(f).name)
@@ -188,7 +187,7 @@ for f in waypoint_files:
         res = prepare_run(f, label, "waypoint")
         if res: runs_waypt.append(res)
 
-# 2. Collision Data Load
+
 for f in collision_files:
     if not is_valid_run(f): continue
     label = get_algo_name(Path(f).name)
@@ -196,7 +195,6 @@ for f in collision_files:
         res = prepare_scalar_run(f, label)
         if res: scalar_collision_runs.append(res)
 
-# 3. Reached Data Load
 for f in reached_files:
     if not is_valid_run(f): continue
     label = get_algo_name(Path(f).name)
@@ -212,7 +210,6 @@ print(f" - Reached files loaded: {len(scalar_reached_runs)}")
 print(f" - Algorithms found: {algos_waypt}")
 
 
-# -------------------- PLOT GENERATION --------------------
 def plot_and_save_single(runs, algos, ylabel, title, fname, ylim=None):
     fig, ax = plt.subplots(figsize=(10, 10))
 
@@ -223,17 +220,17 @@ def plot_and_save_single(runs, algos, ylabel, title, fname, ylim=None):
             valid = np.isfinite(mean)
             if np.any(valid):
                 last = np.where(valid)[0][-1]
-                # 범례에 최종 값 표기 (예: Proposed(0.95 ± 0.02))
+              
                 label = f"{algo}({mean[last]:.2f} ± {std[last]:.2f})"
             else:
                 label = algo
 
             color = COLOR_MAP.get(algo, "gray")
             
-            # 평균선
+        
             ax.plot(X_GRID, mean, linewidth=LINEWIDTH_MEAN,
                     label=label, color=color)
-            # 표준편차 밴드
+
             ax.fill_between(X_GRID, mean-std, mean+std,
                             alpha=ALPHA_BAND, linewidth=0, color=color)
 
@@ -293,9 +290,6 @@ def print_overtake_stats(runs, algos, ref_algo="Proposed"):
         print(f" vs {algo:10s} : {ref_algo} Higher {np.mean(ref_better)*100:.1f}% of time")
 
 
-# -------------------- EXECUTE --------------------
-
-# 1. Waypoint Plot 그리기
 if runs_waypt:
     plot_and_save_single(
         runs=runs_waypt,
@@ -309,7 +303,6 @@ if runs_waypt:
 else:
     print("No waypoint data found!")
 
-# 2. 통계 출력 (Waypoint, Collision, Reached)
 print("\n===== FINAL WAYPOINT MEAN / STD =====")
 for algo, (m, s) in compute_final_waypoint_stats(runs_waypt, algos_waypt).items():
     print(f"{algo:10s} : {m:.3f} ± {s:.3f}")

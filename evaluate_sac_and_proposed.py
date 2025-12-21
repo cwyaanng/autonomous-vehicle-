@@ -28,7 +28,7 @@ def make_env(category , town, points, batch_size: int = 256):
 
     client, world, carla_map = connect_to_carla(town)
     NOW = datetime.now().strftime("%Y%m%d_%H%M%S")
-    SIMULATION = f"TEST_일반화실험_{town}/실험_{NOW}"
+    SIMULATION = f"result/Town03_일반화실험_데이터/TEST_일반화실험_{town}/실험_{NOW}"
 
     env = CarlaWrapperEnv(
         client=client,
@@ -136,7 +136,7 @@ if __name__ == "__main__":
  
     
     # evaluate(
-    #     "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251210_115936/model/제안기법_1차.zip",
+    #     "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/제안기법/20251210_115936/model/제안기법_1차.zip",
     #     episodes=50,          
     #     max_steps_per_episode=30_000,
     #     deterministic=True,
@@ -148,7 +148,7 @@ if __name__ == "__main__":
     # )
     
     # evaluate(
-    #     "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251210_201408/model/제안기법_2차.zip",
+    #     "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/제안기법/20251210_201408/model/제안기법_2차.zip",
     #     episodes=50,          
     #     max_steps_per_episode=30_000,
     #     deterministic=True,
@@ -160,7 +160,7 @@ if __name__ == "__main__":
     # )
     
     # evaluate(
-    #     "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251211_114714/model/제안기법_3차.zip",
+    #     "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/제안기법/20251211_114714/model/제안기법_3차.zip",
     #     episodes=50,          
     #     max_steps_per_episode=30_000,
     #     deterministic=True,
@@ -172,7 +172,7 @@ if __name__ == "__main__":
     # )
     
     # evaluate(
-    #     "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251212_002245/model/제안기법_4차.zip",
+    #     "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/제안기법/20251212_002245/model/제안기법_4차.zip",
     #     episodes=50,          
     #     max_steps_per_episode=30_000,
     #     deterministic=True,
@@ -184,7 +184,7 @@ if __name__ == "__main__":
     # )
     
     # evaluate(
-    #     "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251212_103620/model/제안기법_5차.zip",
+    #     "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/제안기법/20251212_103620/model/제안기법_5차.zip",
     #     episodes=50,          
     #     max_steps_per_episode=30_000,
     #     deterministic=True,
@@ -196,7 +196,7 @@ if __name__ == "__main__":
     # )
     
     # evaluate(
-    #     "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251212_162017/model/제안기법_6차.zip",
+    #     "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/제안기법/20251212_162017/model/제안기법_6차.zip",
     #     episodes=50,          
     #     max_steps_per_episode=30_000,
     #     deterministic=True,
@@ -214,7 +214,7 @@ if __name__ == "__main__":
     # """
     
     # evaluate(
-    #     "/home/wise/chaewon/logs/일반화실험_SAC_모델저장/20251218_160916/model/trained_1M_1M_20251218_160916.zip",
+    #     "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/SAC/20251218_160916/model/trained_1M_1M_20251218_160916.zip",
     #     episodes=50,          
     #     max_steps_per_episode=30_000,
     #     deterministic=True,
@@ -225,7 +225,7 @@ if __name__ == "__main__":
     #     points=(0,0)
     # )
     # evaluate(
-    #     "/home/wise/chaewon/logs/일반화실험_SAC_모델저장/20251218_203607/model/trained_1M_1M_20251218_203607.zip",
+    #     "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/SAC/20251218_203607/model/trained_1M_1M_20251218_203607.zip",
     #     episodes=50,          
     #     max_steps_per_episode=30_000,
     #     deterministic=True,
@@ -236,7 +236,7 @@ if __name__ == "__main__":
     #     points=(0,0)
     # )
     # evaluate(
-    #     "/home/wise/chaewon/logs/일반화실험_SAC_모델저장/20251219_130432/model/trained_1M_1M_20251219_130432.zip",
+    #     "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/SAC/20251219_130432/model/trained_1M_1M_20251219_130432.zip",
     #     episodes=50,          
     #     max_steps_per_episode=30_000,
     #     deterministic=True,
@@ -247,7 +247,7 @@ if __name__ == "__main__":
     #     points=(0,0)
     # )
     # evaluate(
-    #     "/home/wise/chaewon/logs/일반화실험_SAC_모델저장/20251219_162702/model/trained_1M_1M_20251219_162702.zip",
+    #     "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/SAC/20251219_162702/model/trained_1M_1M_20251219_162702.zip",
     #     episodes=50,          
     #     max_steps_per_episode=30_000,
     #     deterministic=True,
@@ -258,7 +258,7 @@ if __name__ == "__main__":
     #     points=(0,0)
     # )
     # evaluate(
-    #     "/home/wise/chaewon/logs/일반화실험_SAC_모델저장/20251219_194714/model/trained_1M_1M_20251219_194714.zip",
+    #     "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/SAC/20251219_194714/model/trained_1M_1M_20251219_194714.zip",
     #     episodes=50,          
     #     max_steps_per_episode=30_000,
     #     deterministic=True,
@@ -269,7 +269,7 @@ if __name__ == "__main__":
     #     points=(0,0)
     # )
     # evaluate(
-    #     "/home/wise/chaewon/logs/일반화실험_SAC_모델저장/20251219_230718/model/trained_1M_1M_20251219_230718.zip",
+    #     "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/SAC/20251219_230718/model/trained_1M_1M_20251219_230718.zip",
     #     episodes=50,          
     #     max_steps_per_episode=30_000,
     #     deterministic=True,
@@ -290,7 +290,7 @@ if __name__ == "__main__":
     # """
     
     # evaluate(
-    #     "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251210_115936/model/제안기법_1차.zip",
+    #     "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/제안기법/20251210_115936/model/제안기법_1차.zip",
     #     episodes=50,          
     #     max_steps_per_episode=30_000,
     #     deterministic=True,
@@ -302,7 +302,7 @@ if __name__ == "__main__":
     # )
     
     # evaluate(
-    #     "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251210_201408/model/제안기법_2차.zip",
+    #     "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/제안기법/20251210_201408/model/제안기법_2차.zip",
     #     episodes=50,          
     #     max_steps_per_episode=30_000,
     #     deterministic=True,
@@ -314,7 +314,7 @@ if __name__ == "__main__":
     # )
     
     # evaluate(
-    #     "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251211_114714/model/제안기법_3차.zip",
+    #     "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/제안기법/20251211_114714/model/제안기법_3차.zip",
     #     episodes=50,          
     #     max_steps_per_episode=30_000,
     #     deterministic=True,
@@ -326,7 +326,7 @@ if __name__ == "__main__":
     # )
     
     # evaluate(
-    #     "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251212_002245/model/제안기법_4차.zip",
+    #     "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/제안기법/20251212_002245/model/제안기법_4차.zip",
     #     episodes=50,          
     #     max_steps_per_episode=30_000,
     #     deterministic=True,
@@ -338,7 +338,7 @@ if __name__ == "__main__":
     # )
     
     # evaluate(
-    #     "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251212_103620/model/제안기법_5차.zip",
+    #     "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/제안기법/20251212_103620/model/제안기법_5차.zip",
     #     episodes=50,          
     #     max_steps_per_episode=30_000,
     #     deterministic=True,
@@ -350,7 +350,7 @@ if __name__ == "__main__":
     # )
     
     # evaluate(
-    #     "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251212_162017/model/제안기법_6차.zip",
+    #     "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/제안기법/20251212_162017/model/제안기법_6차.zip",
     #     episodes=50,          
     #     max_steps_per_episode=30_000,
     #     deterministic=True,
@@ -368,7 +368,7 @@ if __name__ == "__main__":
     # """
     
     # evaluate(
-    #     "/home/wise/chaewon/logs/일반화실험_SAC_모델저장/20251218_160916/model/trained_1M_1M_20251218_160916.zip",
+    #     "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/SAC/20251218_160916/model/trained_1M_1M_20251218_160916.zip",
     #     episodes=50,          
     #     max_steps_per_episode=30_000,
     #     deterministic=True,
@@ -379,7 +379,7 @@ if __name__ == "__main__":
     #     points=(250,250)
     # )
     # evaluate(
-    #     "/home/wise/chaewon/logs/일반화실험_SAC_모델저장/20251218_203607/model/trained_1M_1M_20251218_203607.zip",
+    #     "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/SAC/20251218_203607/model/trained_1M_1M_20251218_203607.zip",
     #     episodes=50,          
     #     max_steps_per_episode=30_000,
     #     deterministic=True,
@@ -390,7 +390,7 @@ if __name__ == "__main__":
     #     points=(250,250)
     # )
     # evaluate(
-    #     "/home/wise/chaewon/logs/일반화실험_SAC_모델저장/20251219_130432/model/trained_1M_1M_20251219_130432.zip",
+    #     "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/SAC/20251219_130432/model/trained_1M_1M_20251219_130432.zip",
     #     episodes=50,          
     #     max_steps_per_episode=30_000,
     #     deterministic=True,
@@ -401,7 +401,7 @@ if __name__ == "__main__":
     #     points=(250,250)
     # )
     # evaluate(
-    #     "/home/wise/chaewon/logs/일반화실험_SAC_모델저장/20251219_162702/model/trained_1M_1M_20251219_162702.zip",
+    #     "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/SAC/20251219_162702/model/trained_1M_1M_20251219_162702.zip",
     #     episodes=50,          
     #     max_steps_per_episode=30_000,
     #     deterministic=True,
@@ -412,7 +412,7 @@ if __name__ == "__main__":
     #     points=(250,250)
     # )
     # evaluate(
-    #     "/home/wise/chaewon/logs/일반화실험_SAC_모델저장/20251219_194714/model/trained_1M_1M_20251219_194714.zip",
+    #     "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/SAC/20251219_194714/model/trained_1M_1M_20251219_194714.zip",
     #     episodes=50,          
     #     max_steps_per_episode=30_000,
     #     deterministic=True,
@@ -423,7 +423,7 @@ if __name__ == "__main__":
     #     points=(250,250)
     # )
     # evaluate(
-    #     "/home/wise/chaewon/logs/일반화실험_SAC_모델저장/20251219_230718/model/trained_1M_1M_20251219_230718.zip",
+    #     "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/SAC/20251219_230718/model/trained_1M_1M_20251219_230718.zip",
     #     episodes=50,          
     #     max_steps_per_episode=30_000,
     #     deterministic=True,
@@ -445,7 +445,7 @@ if __name__ == "__main__":
     """
     
     # evaluate(
-    #     "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251210_115936/model/제안기법_1차.zip",
+    #     "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/제안기법/20251210_115936/model/제안기법_1차.zip",
     #     episodes=50,          
     #     max_steps_per_episode=30_000,
     #     deterministic=True,
@@ -457,7 +457,7 @@ if __name__ == "__main__":
     # )
     
     # evaluate(
-    #     "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251210_201408/model/제안기법_2차.zip",
+    #     "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/제안기법/20251210_201408/model/제안기법_2차.zip",
     #     episodes=50,          
     #     max_steps_per_episode=30_000,
     #     deterministic=True,
@@ -469,7 +469,7 @@ if __name__ == "__main__":
     # )
     
     # evaluate(
-    #     "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251211_114714/model/제안기법_3차.zip",
+    #     "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/제안기법/20251211_114714/model/제안기법_3차.zip",
     #     episodes=50,          
     #     max_steps_per_episode=30_000,
     #     deterministic=True,
@@ -481,7 +481,7 @@ if __name__ == "__main__":
     # )
     
     # evaluate(
-    #     "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251212_002245/model/제안기법_4차.zip",
+    #     "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/제안기법/20251212_002245/model/제안기법_4차.zip",
     #     episodes=50,          
     #     max_steps_per_episode=30_000,
     #     deterministic=True,
@@ -493,7 +493,7 @@ if __name__ == "__main__":
     # )
     
     # evaluate(
-    #     "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251212_103620/model/제안기법_5차.zip",
+    #     "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/제안기법/20251212_103620/model/제안기법_5차.zip",
     #     episodes=50,          
     #     max_steps_per_episode=30_000,
     #     deterministic=True,
@@ -505,7 +505,7 @@ if __name__ == "__main__":
     # )
     
     # evaluate(
-    #     "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251212_162017/model/제안기법_6차.zip",
+    #     "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/제안기법/20251212_162017/model/제안기법_6차.zip",
     #     episodes=50,          
     #     max_steps_per_episode=30_000,
     #     deterministic=True,
@@ -544,50 +544,50 @@ if __name__ == "__main__":
     #     town="Town03",
     #     points=(0,0)
     # )
-    evaluate(
-        "/home/wise/chaewon/logs/TOWN03_학습모델_로그/SAC/20251219_130432/model/trained_1M_1M_20251219_130432.zip",
-        episodes=50,          
-        max_steps_per_episode=30_000,
-        deterministic=True,
-        batch_size=256,
-        render=False,
-        category="SAC",
-        town="Town03",
-        points=(0,0)
-    )
-    evaluate(
-        "/home/wise/chaewon/logs/TOWN03_학습모델_로그/SAC/20251219_162702/model/trained_1M_1M_20251219_162702.zip",
-        episodes=50,          
-        max_steps_per_episode=30_000,
-        deterministic=True,
-        batch_size=256,
-        render=False,
-        category="SAC",
-        town="Town03",
-        points=(0,0)
-    )
-    evaluate(
-        "/home/wise/chaewon/logs/TOWN03_학습모델_로그/SAC/20251219_194714/model/trained_1M_1M_20251219_194714.zip",
-        episodes=50,          
-        max_steps_per_episode=30_000,
-        deterministic=True,
-        batch_size=256,
-        render=False,
-        category="SAC",
-        town="Town03",
-        points=(0,0)
-    )
-    evaluate(
-        "/home/wise/chaewon/logs/TOWN03_학습모델_로그/SAC/20251219_230718/model/trained_1M_1M_20251219_230718.zip",
-        episodes=50,          
-        max_steps_per_episode=30_000,
-        deterministic=True,
-        batch_size=256,
-        render=False,
-        category="SAC",
-        town="Town03",
-        points=(0,0)
-    )
+    # evaluate(
+    #     "/home/wise/chaewon/logs/TOWN03_학습모델_로그/SAC/20251219_130432/model/trained_1M_1M_20251219_130432.zip",
+    #     episodes=50,          
+    #     max_steps_per_episode=30_000,
+    #     deterministic=True,
+    #     batch_size=256,
+    #     render=False,
+    #     category="SAC",
+    #     town="Town03",
+    #     points=(0,0)
+    # )
+    # evaluate(
+    #     "/home/wise/chaewon/logs/TOWN03_학습모델_로그/SAC/20251219_162702/model/trained_1M_1M_20251219_162702.zip",
+    #     episodes=50,          
+    #     max_steps_per_episode=30_000,
+    #     deterministic=True,
+    #     batch_size=256,
+    #     render=False,
+    #     category="SAC",
+    #     town="Town03",
+    #     points=(0,0)
+    # )
+    # evaluate(
+    #     "/home/wise/chaewon/logs/TOWN03_학습모델_로그/SAC/20251219_194714/model/trained_1M_1M_20251219_194714.zip",
+    #     episodes=50,          
+    #     max_steps_per_episode=30_000,
+    #     deterministic=True,
+    #     batch_size=256,
+    #     render=False,
+    #     category="SAC",
+    #     town="Town03",
+    #     points=(0,0)
+    # )
+    # evaluate(
+    #     "/home/wise/chaewon/logs/TOWN03_학습모델_로그/SAC/20251219_230718/model/trained_1M_1M_20251219_230718.zip",
+    #     episodes=50,          
+    #     max_steps_per_episode=30_000,
+    #     deterministic=True,
+    #     batch_size=256,
+    #     render=False,
+    #     category="SAC",
+    #     town="Town03",
+    #     points=(0,0)
+    # )
    
     
     
@@ -600,7 +600,7 @@ if __name__ == "__main__":
     """
     
     evaluate(
-        "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251210_115936/model/제안기법_1차.zip",
+        "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/제안기법/20251210_115936/model/제안기법_1차.zip",
         episodes=50,          
         max_steps_per_episode=30_000,
         deterministic=True,
@@ -612,7 +612,7 @@ if __name__ == "__main__":
     )
     
     evaluate(
-        "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251210_201408/model/제안기법_2차.zip",
+        "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/제안기법/20251210_201408/model/제안기법_2차.zip",
         episodes=50,          
         max_steps_per_episode=30_000,
         deterministic=True,
@@ -624,7 +624,7 @@ if __name__ == "__main__":
     )
     
     evaluate(
-        "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251211_114714/model/제안기법_3차.zip",
+        "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/제안기법/20251211_114714/model/제안기법_3차.zip",
         episodes=50,          
         max_steps_per_episode=30_000,
         deterministic=True,
@@ -636,7 +636,7 @@ if __name__ == "__main__":
     )
     
     evaluate(
-        "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251212_002245/model/제안기법_4차.zip",
+        "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/제안기법/20251212_002245/model/제안기법_4차.zip",
         episodes=50,          
         max_steps_per_episode=30_000,
         deterministic=True,
@@ -648,7 +648,7 @@ if __name__ == "__main__":
     )
     
     evaluate(
-        "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251212_103620/model/제안기법_5차.zip",
+        "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/제안기법/20251212_103620/model/제안기법_5차.zip",
         episodes=50,          
         max_steps_per_episode=30_000,
         deterministic=True,
@@ -660,7 +660,7 @@ if __name__ == "__main__":
     )
     
     evaluate(
-        "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251212_162017/model/제안기법_6차.zip",
+        "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/제안기법/20251212_162017/model/제안기법_6차.zip",
         episodes=50,          
         max_steps_per_episode=30_000,
         deterministic=True,
@@ -678,7 +678,7 @@ if __name__ == "__main__":
     """
     
     evaluate(
-        "/home/wise/chaewon/logs/일반화실험_SAC_모델저장/20251218_160916/model/trained_1M_1M_20251218_160916.zip",
+        "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/SAC/20251218_160916/model/trained_1M_1M_20251218_160916.zip",
         episodes=50,          
         max_steps_per_episode=30_000,
         deterministic=True,
@@ -689,7 +689,7 @@ if __name__ == "__main__":
         points=(300,-100)
     )
     evaluate(
-        "/home/wise/chaewon/logs/일반화실험_SAC_모델저장/20251218_203607/model/trained_1M_1M_20251218_203607.zip",
+        "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/SAC/20251218_203607/model/trained_1M_1M_20251218_203607.zip",
         episodes=50,          
         max_steps_per_episode=30_000,
         deterministic=True,
@@ -700,7 +700,7 @@ if __name__ == "__main__":
         points=(300,-100)
     )
     evaluate(
-        "/home/wise/chaewon/logs/일반화실험_SAC_모델저장/20251219_130432/model/trained_1M_1M_20251219_130432.zip",
+        "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/SAC/20251219_130432/model/trained_1M_1M_20251219_130432.zip",
         episodes=50,          
         max_steps_per_episode=30_000,
         deterministic=True,
@@ -711,7 +711,7 @@ if __name__ == "__main__":
         points=(300,-100)
     )
     evaluate(
-        "/home/wise/chaewon/logs/일반화실험_SAC_모델저장/20251219_162702/model/trained_1M_1M_20251219_162702.zip",
+        "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/SAC/20251219_162702/model/trained_1M_1M_20251219_162702.zip",
         episodes=50,          
         max_steps_per_episode=30_000,
         deterministic=True,
@@ -722,7 +722,7 @@ if __name__ == "__main__":
         points=(300,-100)
     )
     evaluate(
-        "/home/wise/chaewon/logs/일반화실험_SAC_모델저장/20251219_194714/model/trained_1M_1M_20251219_194714.zip",
+        "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/SAC/20251219_194714/model/trained_1M_1M_20251219_194714.zip",
         episodes=50,          
         max_steps_per_episode=30_000,
         deterministic=True,
@@ -733,7 +733,7 @@ if __name__ == "__main__":
         points=(300,-100)
     )
     evaluate(
-        "/home/wise/chaewon/logs/일반화실험_SAC_모델저장/20251219_230718/model/trained_1M_1M_20251219_230718.zip",
+        "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/SAC/20251219_230718/model/trained_1M_1M_20251219_230718.zip",
         episodes=50,          
         max_steps_per_episode=30_000,
         deterministic=True,
@@ -753,7 +753,7 @@ if __name__ == "__main__":
     """
     
     evaluate(
-        "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251210_115936/model/제안기법_1차.zip",
+        "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/제안기법/20251210_115936/model/제안기법_1차.zip",
         episodes=50,          
         max_steps_per_episode=30_000,
         deterministic=True,
@@ -765,7 +765,7 @@ if __name__ == "__main__":
     )
     
     evaluate(
-        "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251210_201408/model/제안기법_2차.zip",
+        "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/제안기법/20251210_201408/model/제안기법_2차.zip",
         episodes=50,          
         max_steps_per_episode=30_000,
         deterministic=True,
@@ -777,7 +777,7 @@ if __name__ == "__main__":
     )
     
     evaluate(
-        "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251211_114714/model/제안기법_3차.zip",
+        "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/제안기법/20251211_114714/model/제안기법_3차.zip",
         episodes=50,          
         max_steps_per_episode=30_000,
         deterministic=True,
@@ -789,7 +789,7 @@ if __name__ == "__main__":
     )
     
     evaluate(
-        "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251212_002245/model/제안기법_4차.zip",
+        "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/제안기법/20251212_002245/model/제안기법_4차.zip",
         episodes=50,          
         max_steps_per_episode=30_000,
         deterministic=True,
@@ -801,7 +801,7 @@ if __name__ == "__main__":
     )
     
     evaluate(
-        "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251212_103620/model/제안기법_5차.zip",
+        "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/제안기법/20251212_103620/model/제안기법_5차.zip",
         episodes=50,          
         max_steps_per_episode=30_000,
         deterministic=True,
@@ -813,7 +813,7 @@ if __name__ == "__main__":
     )
     
     evaluate(
-        "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251212_162017/model/제안기법_6차.zip",
+        "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/제안기법/20251212_162017/model/제안기법_6차.zip",
         episodes=50,          
         max_steps_per_episode=30_000,
         deterministic=True,
@@ -831,7 +831,7 @@ if __name__ == "__main__":
     """
     
     evaluate(
-        "/home/wise/chaewon/logs/일반화실험_SAC_모델저장/20251218_160916/model/trained_1M_1M_20251218_160916.zip",
+        "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/SAC/20251218_160916/model/trained_1M_1M_20251218_160916.zip",
         episodes=50,          
         max_steps_per_episode=30_000,
         deterministic=True,
@@ -842,7 +842,7 @@ if __name__ == "__main__":
         points=(0,0)
     )
     evaluate(
-        "/home/wise/chaewon/logs/일반화실험_SAC_모델저장/20251218_203607/model/trained_1M_1M_20251218_203607.zip",
+        "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/SAC/20251218_203607/model/trained_1M_1M_20251218_203607.zip",
         episodes=50,          
         max_steps_per_episode=30_000,
         deterministic=True,
@@ -853,7 +853,7 @@ if __name__ == "__main__":
         points=(0,0)
     )
     evaluate(
-        "/home/wise/chaewon/logs/일반화실험_SAC_모델저장/20251219_130432/model/trained_1M_1M_20251219_130432.zip",
+        "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/SAC/20251219_130432/model/trained_1M_1M_20251219_130432.zip",
         episodes=50,          
         max_steps_per_episode=30_000,
         deterministic=True,
@@ -864,7 +864,7 @@ if __name__ == "__main__":
         points=(0,0)
     )
     evaluate(
-        "/home/wise/chaewon/logs/일반화실험_SAC_모델저장/20251219_162702/model/trained_1M_1M_20251219_162702.zip",
+        "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/SAC/20251219_162702/model/trained_1M_1M_20251219_162702.zip",
         episodes=50,          
         max_steps_per_episode=30_000,
         deterministic=True,
@@ -875,7 +875,7 @@ if __name__ == "__main__":
         points=(0,0)
     )
     evaluate(
-        "/home/wise/chaewon/logs/일반화실험_SAC_모델저장/20251219_194714/model/trained_1M_1M_20251219_194714.zip",
+        "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/SAC/20251219_194714/model/trained_1M_1M_20251219_194714.zip",
         episodes=50,          
         max_steps_per_episode=30_000,
         deterministic=True,
@@ -886,7 +886,7 @@ if __name__ == "__main__":
         points=(0,0)
     )
     evaluate(
-        "/home/wise/chaewon/logs/일반화실험_SAC_모델저장/20251219_230718/model/trained_1M_1M_20251219_230718.zip",
+        "/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/SAC/20251219_230718/model/trained_1M_1M_20251219_230718.zip",
         episodes=50,          
         max_steps_per_episode=30_000,
         deterministic=True,

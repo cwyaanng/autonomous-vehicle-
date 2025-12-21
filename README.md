@@ -29,11 +29,10 @@
 
 ---
 
-### evaluate : 평가 코드
-- evaluate_town1.py : Town01에서 학습된 모델 평가
-- evaluate_town4.py : Town04에서 학습된 모델 평가
+### logs : 일반화 성능 실험을 진행하면서 저장한 로그와 저장한 모델이 있는 폴더입니다.
+- logs/TOWN03_학습모델_로그_저장된모델 : Town03에서 학습한 모델 및 학습 과정 텐서보드 로그가 저장되어 있습니다.
+- logs/town별_설정한_경로 : 각 Town별로 모델 학습, 모델 테스트 때 설정한 경로를 시각화해 저장해놓은 폴더입니다. 
 
----
 
 ## 시뮬레이션 환경에서 강화학습 실행 또는 오프라인 데이터 수집 코드
 
@@ -47,18 +46,22 @@
 
 ## 시각화 및 결과 분석 코드
 
-- make_plot.py : waypoint 진행도 시각화  
+- make_plot.py : waypoint 진행도를 그래프로 시각화   
   (window_size = 100으로 smoothing 적용)
+
 - make_plot_collision_reached.py :  
-  6개 seed에 대해 training phase 동안의 충돌률 및 도달률 집계
+  6개 seed에 대해 training phase 동안 충돌로 끝난 에피소드 비율/ 도달로 끝난 에피소드 비율 bar chart로 시각화
+  6개 seed에 대해 training phase 동안 에피소드 마지막에 도달한 waypoint의 평균을 bar chart로 시각화 
 
 ---
 
 ## 테스트 코드 
 
-- evaluate_sac_and_proposed.py : 저장된 제안기법, SAC로 학습한 모델을 불러와 테스트를 하는 코드입니다.
+- evaluate_sac_and_proposed.py : 저장된 제안기법, SAC로 학습한 모델을 불러와 일반화성능 테스트를 하는 코드입니다.
 
-- evaluate_cql_awac.py : 저장된 CQL , AWAC 모델을 불러와 테스트를 하는 코드입니다. 
+- evaluate_cql_awac.py : 저장된 CQL , AWAC 모델을 불러와 일반화성능 테스트를 하는 코드입니다. 
+
+- rnd_test.py : Random Network Distillation이 다른 주행 trajectory를 구별할 수 있는지 검증할 때 사용한 코드입니다. 
 
 ---
 

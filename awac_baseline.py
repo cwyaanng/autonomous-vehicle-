@@ -2,7 +2,6 @@
 
 import sys
 
-from test import BATCH_SIZE
 sys.path.append('/home/wise/chaewon/PythonAPI/carla-0.9.8-py3.5-linux-x86_64.egg')  # CARLA egg
 import os
 import numpy as np

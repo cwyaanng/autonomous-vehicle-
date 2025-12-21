@@ -111,7 +111,7 @@ if __name__ == "__main__":
     
     """
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_AWAC_모델저장/20251216_203430/model/awac_offline_online_20251216_203427.d3", 
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/AWAC/20251216_203430/model/awac_offline_online_20251216_203427.d3", 
         start_point=start_pos,
         town=current_town,
         algo_type="AWAC",       
@@ -119,7 +119,7 @@ if __name__ == "__main__":
         n_episodes=5
     )
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_AWAC_모델저장/20251217_010718/model/awac_offline_online_20251217_010715.d3", 
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/AWAC/20251217_010718/model/awac_offline_online_20251217_010715.d3", 
         start_point=start_pos,
         town=current_town,
         algo_type="AWAC",       
@@ -128,7 +128,7 @@ if __name__ == "__main__":
     )
   
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_AWAC_모델저장/20251217_053745/model/awac_offline_online_20251217_053742.d3", 
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/AWAC/20251217_053745/model/awac_offline_online_20251217_053742.d3", 
         start_point=start_pos,
         town=current_town,
         algo_type="AWAC",       
@@ -136,7 +136,7 @@ if __name__ == "__main__":
         n_episodes=5
     )
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_AWAC_모델저장/20251217_091842/model/awac_offline_online_20251217_091840.d3", 
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/AWAC/20251217_091842/model/awac_offline_online_20251217_091840.d3", 
         start_point=start_pos,
         town=current_town,
         algo_type="AWAC",       
@@ -144,7 +144,7 @@ if __name__ == "__main__":
         n_episodes=5
     )
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_AWAC_모델저장/20251217_165559/model/awac_offline_online_20251217_165556.d3", 
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/AWAC/20251217_165559/model/awac_offline_online_20251217_165556.d3", 
         start_point=start_pos,
         town=current_town,
         algo_type="AWAC",       
@@ -152,7 +152,7 @@ if __name__ == "__main__":
         n_episodes=5
     )
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_AWAC_모델저장/20251217_203311/model/awac_offline_online_20251217_203309.d3", 
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/AWAC/20251217_203311/model/awac_offline_online_20251217_203309.d3", 
         start_point=start_pos,
         town=current_town,
         algo_type="AWAC",       
@@ -168,7 +168,7 @@ if __name__ == "__main__":
     
     """
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_CQL_모델저장/20251212_221919/model/cql_offline_online_20251212_221915.d3",     
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/CQL/20251212_221919/model/cql_offline_online_20251212_221915.d3",     
         start_point=start_pos,
         town=current_town,
         algo_type="CQL",        
@@ -178,7 +178,7 @@ if __name__ == "__main__":
     
     
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_CQL_모델저장/20251214_115140/model/cql_offline_online_20251214_115137.d3",     
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/CQL/20251214_115140/model/cql_offline_online_20251214_115137.d3",     
         start_point=start_pos,
         town=current_town,
         algo_type="CQL",        
@@ -187,7 +187,7 @@ if __name__ == "__main__":
     )
     
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_CQL_모델저장/20251214_193829/model/cql_offline_online_20251214_193826.d3",     
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/CQL/20251214_193829/model/cql_offline_online_20251214_193826.d3",     
         start_point=start_pos,
         town=current_town,
         algo_type="CQL",         
@@ -196,7 +196,7 @@ if __name__ == "__main__":
     )
     
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_CQL_모델저장/20251215_233402/model/cql_offline_online_20251215_233359.d3",     
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/CQL/20251215_233402/model/cql_offline_online_20251215_233359.d3",     
         start_point=start_pos,
         town=current_town,
         algo_type="CQL",         
@@ -205,7 +205,7 @@ if __name__ == "__main__":
     )
     
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_CQL_모델저장/20251216_071904/model/cql_offline_online_20251216_071902.d3",     
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/CQL/20251216_071904/model/cql_offline_online_20251216_071902.d3",     
         start_point=start_pos,
         town=current_town,
         algo_type="CQL",         
@@ -214,7 +214,7 @@ if __name__ == "__main__":
     )
     
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_CQL_모델저장/20251216_150552/model/cql_offline_online_20251216_150550.d3",     
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/CQL/20251216_150552/model/cql_offline_online_20251216_150550.d3",     
         start_point=start_pos,
         town=current_town,
         algo_type="CQL",         
@@ -227,7 +227,7 @@ if __name__ == "__main__":
     
     
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_AWAC_모델저장/20251216_203430/model/awac_offline_online_20251216_203427.d3", 
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/AWAC/20251216_203430/model/awac_offline_online_20251216_203427.d3", 
         start_point=start_pos,
         town=current_town,
         algo_type="AWAC",       
@@ -235,7 +235,7 @@ if __name__ == "__main__":
         n_episodes=5
     )
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_AWAC_모델저장/20251217_010718/model/awac_offline_online_20251217_010715.d3", 
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/AWAC/20251217_010718/model/awac_offline_online_20251217_010715.d3", 
         start_point=start_pos,
         town=current_town,
         algo_type="AWAC",       
@@ -244,7 +244,7 @@ if __name__ == "__main__":
     )
   
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_AWAC_모델저장/20251217_053745/model/awac_offline_online_20251217_053742.d3", 
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/AWAC/20251217_053745/model/awac_offline_online_20251217_053742.d3", 
         start_point=start_pos,
         town=current_town,
         algo_type="AWAC",       
@@ -252,7 +252,7 @@ if __name__ == "__main__":
         n_episodes=5
     )
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_AWAC_모델저장/20251217_091842/model/awac_offline_online_20251217_091840.d3", 
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/AWAC/20251217_091842/model/awac_offline_online_20251217_091840.d3", 
         start_point=start_pos,
         town=current_town,
         algo_type="AWAC",       
@@ -260,7 +260,7 @@ if __name__ == "__main__":
         n_episodes=5
     )
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_AWAC_모델저장/20251217_165559/model/awac_offline_online_20251217_165556.d3", 
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/AWAC/20251217_165559/model/awac_offline_online_20251217_165556.d3", 
         start_point=start_pos,
         town=current_town,
         algo_type="AWAC",       
@@ -268,7 +268,7 @@ if __name__ == "__main__":
         n_episodes=5
     )
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_AWAC_모델저장/20251217_203311/model/awac_offline_online_20251217_203309.d3", 
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/AWAC/20251217_203311/model/awac_offline_online_20251217_203309.d3", 
         start_point=start_pos,
         town=current_town,
         algo_type="AWAC",       
@@ -284,7 +284,7 @@ if __name__ == "__main__":
     
     """
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_CQL_모델저장/20251212_221919/model/cql_offline_online_20251212_221915.d3",     
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/CQL/20251212_221919/model/cql_offline_online_20251212_221915.d3",     
         start_point=start_pos,
         town=current_town,
         algo_type="CQL",         
@@ -294,7 +294,7 @@ if __name__ == "__main__":
     
     
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_CQL_모델저장/20251214_115140/model/cql_offline_online_20251214_115137.d3",     
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/CQL/20251214_115140/model/cql_offline_online_20251214_115137.d3",     
         start_point=start_pos,
         town=current_town,
         algo_type="CQL",         
@@ -303,7 +303,7 @@ if __name__ == "__main__":
     )
     
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_CQL_모델저장/20251214_193829/model/cql_offline_online_20251214_193826.d3",     
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/CQL/20251214_193829/model/cql_offline_online_20251214_193826.d3",     
         start_point=start_pos,
         town=current_town,
         algo_type="CQL",         
@@ -312,7 +312,7 @@ if __name__ == "__main__":
     )
     
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_CQL_모델저장/20251215_233402/model/cql_offline_online_20251215_233359.d3",     
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/CQL/20251215_233402/model/cql_offline_online_20251215_233359.d3",     
         start_point=start_pos,
         town=current_town,
         algo_type="CQL",         
@@ -321,7 +321,7 @@ if __name__ == "__main__":
     )
     
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_CQL_모델저장/20251216_071904/model/cql_offline_online_20251216_071902.d3",     
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/CQL/20251216_071904/model/cql_offline_online_20251216_071902.d3",     
         start_point=start_pos,
         town=current_town,
         algo_type="CQL",         
@@ -330,7 +330,7 @@ if __name__ == "__main__":
     )
     
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_CQL_모델저장/20251216_150552/model/cql_offline_online_20251216_150550.d3",     
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/CQL/20251216_150552/model/cql_offline_online_20251216_150550.d3",     
         start_point=start_pos,
         town=current_town,
         algo_type="CQL",         
@@ -343,7 +343,7 @@ if __name__ == "__main__":
     
     
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_AWAC_모델저장/20251216_203430/model/awac_offline_online_20251216_203427.d3", 
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/AWAC/20251216_203430/model/awac_offline_online_20251216_203427.d3", 
         start_point=start_pos,
         town=current_town,
         algo_type="AWAC",       
@@ -351,7 +351,7 @@ if __name__ == "__main__":
         n_episodes=5
     )
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_AWAC_모델저장/20251217_010718/model/awac_offline_online_20251217_010715.d3", 
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/AWAC/20251217_010718/model/awac_offline_online_20251217_010715.d3", 
         start_point=start_pos,
         town=current_town,
         algo_type="AWAC",       
@@ -360,7 +360,7 @@ if __name__ == "__main__":
     )
   
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_AWAC_모델저장/20251217_053745/model/awac_offline_online_20251217_053742.d3", 
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/AWAC/20251217_053745/model/awac_offline_online_20251217_053742.d3", 
         start_point=start_pos,
         town=current_town,
         algo_type="AWAC",       
@@ -368,7 +368,7 @@ if __name__ == "__main__":
         n_episodes=5
     )
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_AWAC_모델저장/20251217_091842/model/awac_offline_online_20251217_091840.d3", 
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/AWAC/20251217_091842/model/awac_offline_online_20251217_091840.d3", 
         start_point=start_pos,
         town=current_town,
         algo_type="AWAC",       
@@ -376,7 +376,7 @@ if __name__ == "__main__":
         n_episodes=5
     )
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_AWAC_모델저장/20251217_165559/model/awac_offline_online_20251217_165556.d3", 
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/AWAC/20251217_165559/model/awac_offline_online_20251217_165556.d3", 
         start_point=start_pos,
         town=current_town,
         algo_type="AWAC",       
@@ -384,7 +384,7 @@ if __name__ == "__main__":
         n_episodes=5
     )
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_AWAC_모델저장/20251217_203311/model/awac_offline_online_20251217_203309.d3", 
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/AWAC/20251217_203311/model/awac_offline_online_20251217_203309.d3", 
         start_point=start_pos,
         town=current_town,
         algo_type="AWAC",       
@@ -400,7 +400,7 @@ if __name__ == "__main__":
     
     """
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_CQL_모델저장/20251212_221919/model/cql_offline_online_20251212_221915.d3",     
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/CQL/20251212_221919/model/cql_offline_online_20251212_221915.d3",     
         start_point=start_pos,
         town=current_town,
         algo_type="CQL",         
@@ -410,7 +410,7 @@ if __name__ == "__main__":
     
     
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_CQL_모델저장/20251214_115140/model/cql_offline_online_20251214_115137.d3",     
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/CQL/20251214_115140/model/cql_offline_online_20251214_115137.d3",     
         start_point=start_pos,
         town=current_town,
         algo_type="CQL",         
@@ -419,7 +419,7 @@ if __name__ == "__main__":
     )
     
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_CQL_모델저장/20251214_193829/model/cql_offline_online_20251214_193826.d3",     
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/CQL/20251214_193829/model/cql_offline_online_20251214_193826.d3",     
         start_point=start_pos,
         town=current_town,
         algo_type="CQL",         
@@ -428,7 +428,7 @@ if __name__ == "__main__":
     )
     
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_CQL_모델저장/20251215_233402/model/cql_offline_online_20251215_233359.d3",     
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/CQL/20251215_233402/model/cql_offline_online_20251215_233359.d3",     
         start_point=start_pos,
         town=current_town,
         algo_type="CQL",         
@@ -437,7 +437,7 @@ if __name__ == "__main__":
     )
     
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_CQL_모델저장/20251216_071904/model/cql_offline_online_20251216_071902.d3",     
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/CQL/20251216_071904/model/cql_offline_online_20251216_071902.d3",     
         start_point=start_pos,
         town=current_town,
         algo_type="CQL",         
@@ -446,7 +446,7 @@ if __name__ == "__main__":
     )
     
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_CQL_모델저장/20251216_150552/model/cql_offline_online_20251216_150550.d3",     
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/CQL/20251216_150552/model/cql_offline_online_20251216_150550.d3",     
         start_point=start_pos,
         town=current_town,
         algo_type="CQL",         
@@ -460,7 +460,7 @@ if __name__ == "__main__":
     
     
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_AWAC_모델저장/20251216_203430/model/awac_offline_online_20251216_203427.d3", 
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/AWAC/20251216_203430/model/awac_offline_online_20251216_203427.d3", 
         start_point=start_pos,
         town=current_town,
         algo_type="AWAC",       
@@ -468,7 +468,7 @@ if __name__ == "__main__":
         n_episodes=5
     )
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_AWAC_모델저장/20251217_010718/model/awac_offline_online_20251217_010715.d3", 
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/AWAC/20251217_010718/model/awac_offline_online_20251217_010715.d3", 
         start_point=start_pos,
         town=current_town,
         algo_type="AWAC",       
@@ -477,7 +477,7 @@ if __name__ == "__main__":
     )
   
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_AWAC_모델저장/20251217_053745/model/awac_offline_online_20251217_053742.d3", 
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/AWAC/20251217_053745/model/awac_offline_online_20251217_053742.d3", 
         start_point=start_pos,
         town=current_town,
         algo_type="AWAC",       
@@ -485,7 +485,7 @@ if __name__ == "__main__":
         n_episodes=5
     )
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_AWAC_모델저장/20251217_091842/model/awac_offline_online_20251217_091840.d3", 
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/AWAC/20251217_091842/model/awac_offline_online_20251217_091840.d3", 
         start_point=start_pos,
         town=current_town,
         algo_type="AWAC",       
@@ -493,7 +493,7 @@ if __name__ == "__main__":
         n_episodes=5
     )
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_AWAC_모델저장/20251217_165559/model/awac_offline_online_20251217_165556.d3", 
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/AWAC/20251217_165559/model/awac_offline_online_20251217_165556.d3", 
         start_point=start_pos,
         town=current_town,
         algo_type="AWAC",       
@@ -501,7 +501,7 @@ if __name__ == "__main__":
         n_episodes=5
     )
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_AWAC_모델저장/20251217_203311/model/awac_offline_online_20251217_203309.d3", 
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/AWAC/20251217_203311/model/awac_offline_online_20251217_203309.d3", 
         start_point=start_pos,
         town=current_town,
         algo_type="AWAC",       
@@ -517,7 +517,7 @@ if __name__ == "__main__":
     
     """
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_CQL_모델저장/20251212_221919/model/cql_offline_online_20251212_221915.d3",     
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/CQL/20251212_221919/model/cql_offline_online_20251212_221915.d3",     
         start_point=start_pos,
         town=current_town,
         algo_type="CQL",         
@@ -527,7 +527,7 @@ if __name__ == "__main__":
     
     
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_CQL_모델저장/20251214_115140/model/cql_offline_online_20251214_115137.d3",     
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/CQL/20251214_115140/model/cql_offline_online_20251214_115137.d3",     
         start_point=start_pos,
         town=current_town,
         algo_type="CQL",         
@@ -536,7 +536,7 @@ if __name__ == "__main__":
     )
     
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_CQL_모델저장/20251214_193829/model/cql_offline_online_20251214_193826.d3",     
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/CQL/20251214_193829/model/cql_offline_online_20251214_193826.d3",     
         start_point=start_pos,
         town=current_town,
         algo_type="CQL",         
@@ -545,7 +545,7 @@ if __name__ == "__main__":
     )
     
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_CQL_모델저장/20251215_233402/model/cql_offline_online_20251215_233359.d3",     
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/CQL/20251215_233402/model/cql_offline_online_20251215_233359.d3",     
         start_point=start_pos,
         town=current_town,
         algo_type="CQL",         
@@ -554,7 +554,7 @@ if __name__ == "__main__":
     )
     
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_CQL_모델저장/20251216_071904/model/cql_offline_online_20251216_071902.d3",     
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/CQL/20251216_071904/model/cql_offline_online_20251216_071902.d3",     
         start_point=start_pos,
         town=current_town,
         algo_type="CQL",         
@@ -563,7 +563,7 @@ if __name__ == "__main__":
     )
     
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_CQL_모델저장/20251216_150552/model/cql_offline_online_20251216_150550.d3",     
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/CQL/20251216_150552/model/cql_offline_online_20251216_150550.d3",     
         start_point=start_pos,
         town=current_town,
         algo_type="CQL",         
@@ -577,7 +577,7 @@ if __name__ == "__main__":
     
     
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_AWAC_모델저장/20251216_203430/model/awac_offline_online_20251216_203427.d3", 
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/AWAC/20251216_203430/model/awac_offline_online_20251216_203427.d3", 
         start_point=start_pos,
         town=current_town,
         algo_type="AWAC",       
@@ -585,7 +585,7 @@ if __name__ == "__main__":
         n_episodes=5
     )
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_AWAC_모델저장/20251217_010718/model/awac_offline_online_20251217_010715.d3", 
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/AWAC/20251217_010718/model/awac_offline_online_20251217_010715.d3", 
         start_point=start_pos,
         town=current_town,
         algo_type="AWAC",       
@@ -594,7 +594,7 @@ if __name__ == "__main__":
     )
   
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_AWAC_모델저장/20251217_053745/model/awac_offline_online_20251217_053742.d3", 
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/AWAC/20251217_053745/model/awac_offline_online_20251217_053742.d3", 
         start_point=start_pos,
         town=current_town,
         algo_type="AWAC",       
@@ -602,7 +602,7 @@ if __name__ == "__main__":
         n_episodes=5
     )
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_AWAC_모델저장/20251217_091842/model/awac_offline_online_20251217_091840.d3", 
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/AWAC/20251217_091842/model/awac_offline_online_20251217_091840.d3", 
         start_point=start_pos,
         town=current_town,
         algo_type="AWAC",       
@@ -610,7 +610,7 @@ if __name__ == "__main__":
         n_episodes=5
     )
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_AWAC_모델저장/20251217_165559/model/awac_offline_online_20251217_165556.d3", 
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/AWAC/20251217_165559/model/awac_offline_online_20251217_165556.d3", 
         start_point=start_pos,
         town=current_town,
         algo_type="AWAC",       
@@ -618,7 +618,7 @@ if __name__ == "__main__":
         n_episodes=5
     )
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_AWAC_모델저장/20251217_203311/model/awac_offline_online_20251217_203309.d3", 
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/AWAC/20251217_203311/model/awac_offline_online_20251217_203309.d3", 
         start_point=start_pos,
         town=current_town,
         algo_type="AWAC",       
@@ -634,7 +634,7 @@ if __name__ == "__main__":
     
     """
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_CQL_모델저장/20251212_221919/model/cql_offline_online_20251212_221915.d3",     
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/CQL/20251212_221919/model/cql_offline_online_20251212_221915.d3",     
         start_point=start_pos,
         town=current_town,
         algo_type="CQL",         
@@ -644,7 +644,7 @@ if __name__ == "__main__":
     
     
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_CQL_모델저장/20251214_115140/model/cql_offline_online_20251214_115137.d3",     
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/CQL/20251214_115140/model/cql_offline_online_20251214_115137.d3",     
         start_point=start_pos,
         town=current_town,
         algo_type="CQL",         
@@ -653,7 +653,7 @@ if __name__ == "__main__":
     )
     
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_CQL_모델저장/20251214_193829/model/cql_offline_online_20251214_193826.d3",     
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/CQL/20251214_193829/model/cql_offline_online_20251214_193826.d3",     
         start_point=start_pos,
         town=current_town,
         algo_type="CQL",         
@@ -662,7 +662,7 @@ if __name__ == "__main__":
     )
     
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_CQL_모델저장/20251215_233402/model/cql_offline_online_20251215_233359.d3",     
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/CQL/20251215_233402/model/cql_offline_online_20251215_233359.d3",     
         start_point=start_pos,
         town=current_town,
         algo_type="CQL",         
@@ -671,7 +671,7 @@ if __name__ == "__main__":
     )
     
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_CQL_모델저장/20251216_071904/model/cql_offline_online_20251216_071902.d3",     
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/CQL/20251216_071904/model/cql_offline_online_20251216_071902.d3",     
         start_point=start_pos,
         town=current_town,
         algo_type="CQL",         
@@ -680,7 +680,7 @@ if __name__ == "__main__":
     )
     
     test(
-        model_path="/home/wise/chaewon/logs/일반화실험_CQL_모델저장/20251216_150552/model/cql_offline_online_20251216_150550.d3",     
+        model_path="/home/wise/chaewon/logs/TOWN03_학습모델_로그_저장된모델/CQL/20251216_150552/model/cql_offline_online_20251216_150550.d3",     
         start_point=start_pos,
         town=current_town,
         algo_type="CQL",        

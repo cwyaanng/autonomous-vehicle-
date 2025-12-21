@@ -5,10 +5,6 @@ run.py
 
 """
 
-
-
-
-
 import os
 import sys
 
@@ -63,7 +59,7 @@ def pid_control(client, world, carla_map, start_coords, filename):
         [0.5, 1.0],                # kp_t 
         [0.0, 0.05],               # ki_t 
        # [0.0, 0.05]                # kd_t 
-        [0.0, 0.05] 
+        [0.0] 
     )
     
     blueprint_library = world.get_blueprint_library()
@@ -144,10 +140,10 @@ if __name__ == "__main__":
         # end_coords = (50, 0)
         # pid_control(client, world, carla_map , start_coords, "route_1")
         
-        start_coords = (0, 100)
-        end_coords = (0, -200)
+        # start_coords = (0, 100)
+        # end_coords = (0, -200)
         
-        pid_control(client, world, carla_map , start_coords, "route_2")
+        # pid_control(client, world, carla_map , start_coords, "route_2")
         start_coords = (-450, 350)
         end_coords = (0, 0) 
         pid_control(client, world, carla_map , start_coords,  "route_3")
