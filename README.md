@@ -22,10 +22,10 @@
 
 ---
 
-### result : 1차 실험 결과 - 일반화 실험 이전 제안기법/모델 학습 결과 
-- 실험 결과 CSV 파일 저장 디렉토리
-- final_result_town3 : Town03 환경 실험 결과
-- final_result_town4 : Town04 환경 실험 결과
+### result : 실험 결과 - 일반화 실험 이전 모델 학습 결과 및 일반화 성능 실험 데이터 
+- result/Town03_일반화실험_데이터 : 일반화 성능 실험 데이터 텐서보드 로그를 Town별로 나누어 저장한 폴더입니다. 
+- result/Town03_학습_결과데이터 : Town03 환경 제안기법&베이스라인 모델 학습 결과
+- result/Town04_학습_결과데이터 : Town04 환경 제안기법&베이스라인 모델 학습 결과
 
 ---
 
@@ -62,6 +62,8 @@
 - evaluate_cql_awac.py : 저장된 CQL , AWAC 모델을 불러와 일반화성능 테스트를 하는 코드입니다. 
 
 - rnd_test.py : Random Network Distillation이 다른 주행 trajectory를 구별할 수 있는지 검증할 때 사용한 코드입니다. 
+
+- make_plot_advantage.py : 각 기법끼리 얼마나 역전을 했는지 분석하고, plot으로 시각화하는 코드입니다. 
 
 ---
 
