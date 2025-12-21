@@ -21,7 +21,9 @@ function 목록
 
 6. generate_route_town4 - generate_forward_route 에 슬라이싱만 추가한 것  
 
-7. visualize_all_waypints : Town 안에 있는 전체 waypoint를 시각화 하는 함수입니다. 
+7. generate_forward_route_for_PID - PID 주행을 위한 경로 생성 
+
+8. visualize_all_waypints : Town 안에 있는 전체 waypoint를 시각화 하는 함수입니다. 
 경로를 설정할 때 먼저 이것으로 모든 waypoint를 시각화하고, 그걸 보면서 출발지or도착지를 설정하면 약간 더 편리합니다! 
 
 """
