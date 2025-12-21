@@ -58,7 +58,7 @@ Town04에서 수집한 Offline Dataset은 두 가지가 있습니다.
 ### 2-1. 사전 필수 체크리스트 
 
 **[!!중요] 경로 설정 확인**
-실험 시작 전, 각 모델 학습 파일의 `DATA_DIR` 경로가 **현재 학습을 진행하고자 하는 Town의 Offline Data**가 저장된 경로와 일치하는지 확인해야 합니다 
+실험 시작 전, 각 모델 학습 파일의 `DATA_DIR` 경로가 현재 학습을 진행하고자 하는 Town의 Offline Data가 저장된 경로와 일치하는지 확인해야 합니다 
 
 * **DATA_DIR 예시**: `offline_data_for_replaybuffer/dataset_town04`
 * **LOGGING 경로 예시**: `SIMULATION = "TOWN4_제안기법_..."`
