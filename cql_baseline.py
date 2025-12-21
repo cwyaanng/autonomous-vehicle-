@@ -189,7 +189,7 @@ def main(start_point, town):
 
 if __name__ == "__main__":
     if len(sys.argv) != 4:
-        print("입력 형식: python run_proposed.py <start_x> <start_y> <town이름>\n town 이름은 다음 중 하나입니다 : Town01 / Town02 / Town03 / Town04 / Town05")
+        print("입력 형식: python cql_baseline.py <start_x> <start_y> <town이름>\n town 이름은 다음 중 하나입니다 : Town01 / Town02 / Town03 / Town04 / Town05")
         sys.exit(1)
 
     try:
