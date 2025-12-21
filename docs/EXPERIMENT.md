@@ -39,9 +39,11 @@ Town03 환경에서 제안 기법 및 베이스라인 모델(CQL, SAC, AWAC)에 
 또한 Town04에서 AWAC의 경우에는 학습 경로가 다른 기법과 다르게 설정된 것을 확인했습니다
 
 [이전 경로]
+
 <img src="readmeimage/town04_old.png" width="300" height="300">
 
 [수정된 경로]
+
 <img src="readmeimage/town04_new.png" width="300" height="300">
 
 따라서 만약 일반화 성능 검증을 위해 Town04에서 모델 학습 및 저장을 다시 해야 한다면 수정된 경로에서 학습 실행을 해 주시면 정말 감사드리겠습니다. 
