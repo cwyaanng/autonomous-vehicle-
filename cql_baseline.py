@@ -21,8 +21,8 @@ from datetime import datetime
 # =======================
 # Configs
 # =======================
-DATA_DIR = "offline_data_for_replaybuffer/dataset_town03"
-LOG_ROOT = "logs/일반화실험_CQL_모델저장"
+DATA_DIR = "offline_data_for_replaybuffer/dataset_town04"
+LOG_ROOT = "logs/CQL실험"
 
 DO_OFFLINE_PRETRAIN = False
 PRETRAIN_STEPS = 50_000          

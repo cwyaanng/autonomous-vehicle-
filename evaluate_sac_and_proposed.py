@@ -92,15 +92,10 @@ def evaluate(
 
     # 통계 저장용
     ep_returns: List[float] = []
-    ep_route_completions: List[float] = []
-    ep_success_flags: List[int] = []
 
     for ep in range(1, episodes + 1):
         obs = env.reset()
         ep_reward = 0.0
-
-        route_completion = None
-        success = 0  
 
         for step in range(max_steps_per_episode):
             action, _ = model.predict(obs, deterministic=deterministic)
@@ -114,46 +109,19 @@ def evaluate(
                     pass
 
             if dones[0]:
-                info = infos[0]
-
-                ep_info: Dict[str, Any] = info.get("episode", {})
-                route_completion = ep_info.get("episode/route_completion", None)
-                done_reached = ep_info.get("episode/done_reached", None)
-                if done_reached is not None:
-                    success = int(done_reached)
-
                 print(
                     f"[Episode {ep}] steps={step+1}, "
-                    f"return={ep_reward:.2f}, "
-                    f"route_completion={route_completion}, "
-                    f"success={success}"
+                    f"return={ep_reward:.2f} "
                 )
                 break
 
         else:
             print(
-                f"[Episode {ep}] MAX steps reached, return={ep_reward:.2f}, "
-                f"route_completion={route_completion}, success={success}"
+                f"[Episode {ep}] MAX steps reached, return={ep_reward:.2f}"
             )
 
         ep_returns.append(ep_reward)
-        if route_completion is not None:
-            ep_route_completions.append(float(route_completion))
-        ep_success_flags.append(success)
-
     env.close()
-
-    n = len(ep_returns)
-    mean_return = np.mean(ep_returns) if n > 0 else float("nan")
-    std_return = np.std(ep_returns) if n > 0 else float("nan")
-
-    if ep_route_completions:
-        mean_rc = np.mean(ep_route_completions)
-        std_rc = np.std(ep_route_completions)
-    else:
-        mean_rc, std_rc = float("nan"), float("nan")
-
-    success_rate = np.mean(ep_success_flags) if ep_success_flags else float("nan")
 
 if __name__ == "__main__":
     
@@ -500,53 +468,53 @@ if __name__ == "__main__":
     #     points=(0,0)
     # )
     
-    evaluate(
-        "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251211_114714/model/제안기법_3차.zip",
-        episodes=50,          
-        max_steps_per_episode=30_000,
-        deterministic=True,
-        batch_size=256,
-        render=False,
-        category="제안기법",
-        town="Town03",
-        points=(0,0)
-    )
+    # evaluate(
+    #     "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251211_114714/model/제안기법_3차.zip",
+    #     episodes=50,          
+    #     max_steps_per_episode=30_000,
+    #     deterministic=True,
+    #     batch_size=256,
+    #     render=False,
+    #     category="제안기법",
+    #     town="Town03",
+    #     points=(0,0)
+    # )
     
-    evaluate(
-        "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251212_002245/model/제안기법_4차.zip",
-        episodes=50,          
-        max_steps_per_episode=30_000,
-        deterministic=True,
-        batch_size=256,
-        render=False,
-        category="제안기법",
-        town="Town03",
-        points=(0,0)
-    )
+    # evaluate(
+    #     "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251212_002245/model/제안기법_4차.zip",
+    #     episodes=50,          
+    #     max_steps_per_episode=30_000,
+    #     deterministic=True,
+    #     batch_size=256,
+    #     render=False,
+    #     category="제안기법",
+    #     town="Town03",
+    #     points=(0,0)
+    # )
     
-    evaluate(
-        "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251212_103620/model/제안기법_5차.zip",
-        episodes=50,          
-        max_steps_per_episode=30_000,
-        deterministic=True,
-        batch_size=256,
-        render=False,
-        category="제안기법",
-        town="Town03",
-        points=(0,0)
-    )
+    # evaluate(
+    #     "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251212_103620/model/제안기법_5차.zip",
+    #     episodes=50,          
+    #     max_steps_per_episode=30_000,
+    #     deterministic=True,
+    #     batch_size=256,
+    #     render=False,
+    #     category="제안기법",
+    #     town="Town03",
+    #     points=(0,0)
+    # )
     
-    evaluate(
-        "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251212_162017/model/제안기법_6차.zip",
-        episodes=50,          
-        max_steps_per_episode=30_000,
-        deterministic=True,
-        batch_size=256,
-        render=False,
-        category="제안기법",
-        town="Town03",
-        points=(0,0)
-    )
+    # evaluate(
+    #     "/home/wise/chaewon/logs/일반화실험_제안기법_모델저장/20251212_162017/model/제안기법_6차.zip",
+    #     episodes=50,          
+    #     max_steps_per_episode=30_000,
+    #     deterministic=True,
+    #     batch_size=256,
+    #     render=False,
+    #     category="제안기법",
+    #     town="Town03",
+    #     points=(0,0)
+    # )
 
     """ 
     
@@ -554,8 +522,30 @@ if __name__ == "__main__":
     
     """
     
+    # evaluate(
+    #     "/home/wise/chaewon/logs/TOWN03_학습모델_로그/SAC/20251218_160916/model/trained_1M_1M_20251218_160916.zip",
+    #     episodes=50,          
+    #     max_steps_per_episode=30_000,
+    #     deterministic=True,
+    #     batch_size=256,
+    #     render=False,
+    #     category="SAC",
+    #     town="Town03",
+    #     points=(0,0)
+    # )
+    # evaluate(
+    #     "/home/wise/chaewon/logs/TOWN03_학습모델_로그/SAC/20251218_203607/model/trained_1M_1M_20251218_203607.zip",
+    #     episodes=50,          
+    #     max_steps_per_episode=30_000,
+    #     deterministic=True,
+    #     batch_size=256,
+    #     render=False,
+    #     category="SAC",
+    #     town="Town03",
+    #     points=(0,0)
+    # )
     evaluate(
-        "/home/wise/chaewon/logs/일반화실험_SAC_모델저장/20251218_160916/model/trained_1M_1M_20251218_160916.zip",
+        "/home/wise/chaewon/logs/TOWN03_학습모델_로그/SAC/20251219_130432/model/trained_1M_1M_20251219_130432.zip",
         episodes=50,          
         max_steps_per_episode=30_000,
         deterministic=True,
@@ -566,7 +556,7 @@ if __name__ == "__main__":
         points=(0,0)
     )
     evaluate(
-        "/home/wise/chaewon/logs/일반화실험_SAC_모델저장/20251218_203607/model/trained_1M_1M_20251218_203607.zip",
+        "/home/wise/chaewon/logs/TOWN03_학습모델_로그/SAC/20251219_162702/model/trained_1M_1M_20251219_162702.zip",
         episodes=50,          
         max_steps_per_episode=30_000,
         deterministic=True,
@@ -577,7 +567,7 @@ if __name__ == "__main__":
         points=(0,0)
     )
     evaluate(
-        "/home/wise/chaewon/logs/일반화실험_SAC_모델저장/20251219_130432/model/trained_1M_1M_20251219_130432.zip",
+        "/home/wise/chaewon/logs/TOWN03_학습모델_로그/SAC/20251219_194714/model/trained_1M_1M_20251219_194714.zip",
         episodes=50,          
         max_steps_per_episode=30_000,
         deterministic=True,
@@ -588,29 +578,7 @@ if __name__ == "__main__":
         points=(0,0)
     )
     evaluate(
-        "/home/wise/chaewon/logs/일반화실험_SAC_모델저장/20251219_162702/model/trained_1M_1M_20251219_162702.zip",
-        episodes=50,          
-        max_steps_per_episode=30_000,
-        deterministic=True,
-        batch_size=256,
-        render=False,
-        category="SAC",
-        town="Town03",
-        points=(0,0)
-    )
-    evaluate(
-        "/home/wise/chaewon/logs/일반화실험_SAC_모델저장/20251219_194714/model/trained_1M_1M_20251219_194714.zip",
-        episodes=50,          
-        max_steps_per_episode=30_000,
-        deterministic=True,
-        batch_size=256,
-        render=False,
-        category="SAC",
-        town="Town03",
-        points=(0,0)
-    )
-    evaluate(
-        "/home/wise/chaewon/logs/일반화실험_SAC_모델저장/20251219_230718/model/trained_1M_1M_20251219_230718.zip",
+        "/home/wise/chaewon/logs/TOWN03_학습모델_로그/SAC/20251219_230718/model/trained_1M_1M_20251219_230718.zip",
         episodes=50,          
         max_steps_per_episode=30_000,
         deterministic=True,

@@ -1,5 +1,9 @@
 """
 RND error이 out of distribution을 판별하는지 실험하기 위한 코드입니다.
+직선 주행 데이터만 담은 route 6의 데이터로 네트워크를 학습하고,
+타원형 주행 데이터만 담은 route 7의 데이터로 테스트했습니다.
+
+logs/Town03_offline_data_경로 폴더에서 해당 오프라인 데이터의 궤적을 확인할 수 있습니다. 
 
 """
 import os
@@ -13,7 +17,7 @@ import torch as th
 from torch.utils.data import Dataset, DataLoader
 import matplotlib.pyplot as plt
 
-DATA_DIR   = "dataset_1"
+DATA_DIR   = "/home/wise/chaewon/offline_data_for_replaybuffer/dataset_town03"
 STATE_KEY  = "observations"
 ACTION_KEY = "actions"
 
@@ -88,7 +92,7 @@ def main():
     rng = np.random.default_rng(SEED)
     data_dir = Path(DATA_DIR)
 
-    # 파일 수집
+
     route6_files = sorted(glob.glob(str(data_dir / "route_6*.npz")))
     circle_route_files = sorted(glob.glob(str(data_dir / f"route_7*.npz")))
     assert len(route6_files) > 0, "no file for straight route."

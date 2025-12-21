@@ -371,7 +371,6 @@ def generate_route_town1(carla_map, start_coords, end_coords, max_dist=2000, wp_
     if iterations >= max_dist:
         print(f"최대 탐색 거리({max_dist})에 도달")
     
-    print(f"경로 생성 완료: {len(route_waypoints)}개 웨이포인트, 목적지까지 최소 거리: {min_distance_to_goal:.2f}m")
     
     if len(route_waypoints) >= 2:
  
@@ -393,8 +392,6 @@ def generate_route_town1(carla_map, start_coords, end_coords, max_dist=2000, wp_
         if len(route_waypoints) > 100:
             route_waypoints = route_waypoints[420:-30]
             print(f"경로를 100번째 웨이포인트, 300 전 잘라서 {len(route_waypoints)}개 남음")
-        else:
-            print("웨이포인트 개수가 100개 미만이라 잘라낼 수 없음")
         
         return route_waypoints
 
@@ -474,22 +471,16 @@ def generate_route_town2(
         if remain_steps is not None:
             remain_steps -= 1
             if remain_steps <= 0:
-                if verbose: print(f"[forward] steps 완료: traveled={traveled:.1f} m, steps={steps}")
                 break
 
     if it >= max_steps_cap and verbose:
         print(f"[forward] max_steps_cap({max_steps_cap}) 도달")
 
-    if verbose:
-        print(f"[forward] 경로 생성: {len(route)} wp, 총 거리 {traveled:.1f} m")
         
     if len(route) > 70:
         route = route[70:]
         if verbose:
             print(f"[forward] 처음 {60}개 웨이포인트를 버림 -> {len(route)} wp 남음")
-    else:
-        if verbose:
-            print(f"[forward] 웨이포인트 수가 {60}개 이하라서 자르지 않음")
 
     return route
 
@@ -560,7 +551,6 @@ def generate_route_town3(
         if remain_steps is not None:
             remain_steps -= 1
             if remain_steps <= 0:
-                if verbose: print(f"[forward] steps 완료: traveled={traveled:.1f} m, steps={steps}")
                 break
 
     if it >= max_steps_cap and verbose:
@@ -573,10 +563,7 @@ def generate_route_town3(
         route = route[70:]
         if verbose:
             print(f"[forward] 처음 {70}개 웨이포인트를 버림 -> {len(route)} wp 남음")
-    else:
-        if verbose:
-            print(f"[forward] 웨이포인트 수가 {70}개 이하라서 자르지 않음")
-
+            
     return route
   
 
@@ -644,19 +631,100 @@ def generate_route_town4(
         if remain_steps is not None:
             remain_steps -= 1
             if remain_steps <= 0:
-                if verbose: print(f"[forward] steps 완료: traveled={traveled:.1f} m, steps={steps}")
+                break
+
+    if it >= max_steps_cap and verbose:
+        print(f"[forward] max_steps_cap({max_steps_cap}) 도달")
+
+    route = route[150:-1650]
+    
+    if verbose:
+        print(f"[forward] 최종 경로 생성: {len(route)} wp")
+        
+    return route
+  
+def generate_forward_route_for_PID(
+    carla_map,
+    start_coords,
+    wp_separation: float = 2.0,
+    steps: int = 500,               
+    prefer_same_lane: bool = True,    
+    max_steps_cap: int = 100000,      
+    verbose: bool = True,
+):
+    """
+    replay buffer을 초기화하기 위해 pid controller로 offline data를 모으기 위한 경로를 설정하는 부분입니다. 
+    """
+
+    start_raw = carla.Location(float(start_coords[0]), float(start_coords[1]), 0.0)
+    start_wp = carla_map.get_waypoint(start_raw, project_to_road=True, lane_type=carla.LaneType.Driving)
+    if start_wp is None:
+        if verbose: print(f"[forward] 시작점 근처 도로 없음: ({start_raw.x:.1f}, {start_raw.y:.1f})")
+        return []
+
+    route = [start_wp]
+    cur = start_wp
+    lane_id0 = cur.lane_id
+
+    remain_steps = steps if steps is not None else None
+    traveled = 0.0
+
+    it = 0
+    while it < max_steps_cap:
+        nxts = cur.next(wp_separation)
+        if not nxts:
+            if verbose: print("[forward] 다음 웨이포인트 없음. 종료")
+            break
+        
+        cand = ([wp for wp in nxts if wp.lane_id == lane_id0] or nxts) if prefer_same_lane else nxts
+
+        # 진행 방향(헤딩) 연속성 + 전진성 점수화
+        best, best_score = None, float("inf")
+        fwd = cur.transform.get_forward_vector()
+        fwd_vec = np.array([fwd.x, fwd.y], dtype=np.float32)
+        fwd_norm = np.linalg.norm(fwd_vec) + 1e-9
+
+        for wp in cand:
+            f2 = wp.transform.get_forward_vector()
+            f2_vec = np.array([f2.x, f2.y], dtype=np.float32)
+            cos_th = float(np.dot(fwd_vec, f2_vec) / (fwd_norm * (np.linalg.norm(f2_vec) + 1e-9)))
+            heading_penalty = 1.0 - np.clip(cos_th, -1.0, 1.0)  
+          
+            dx = wp.transform.location.x - cur.transform.location.x
+            dy = wp.transform.location.y - cur.transform.location.y
+            forward_proj = float((dx * fwd_vec[0] + dy * fwd_vec[1]) / (fwd_norm + 1e-9))
+            forward_penalty = -forward_proj  
+
+            score = 2.0 * heading_penalty + 0.1 * forward_penalty
+            if score < best_score:
+                best_score, best = score, wp
+
+        if best is None:
+            if verbose: print("[forward] 적절한 다음 웨이포인트 없음. 종료")
+            break
+
+        route.append(best)
+        moved = cur.transform.location.distance(best.transform.location)
+        traveled += moved
+        cur = best
+        it += 1
+
+        if remain_steps is not None:
+            remain_steps -= 1
+            if remain_steps <= 0:
                 break
 
     if it >= max_steps_cap and verbose:
         print(f"[forward] max_steps_cap({max_steps_cap}) 도달")
 
     if verbose:
-        print(f"[forward] 경로 생성: {len(route)} wp, 총 거리 {traveled:.1f} m")
+        print(f"[forward] 경로 생성: {len(route)} wp")
         
-    route = route[150:-150]
-     
     return route
   
+
+
+
 
 
 def visualize_all_waypoints(carla_map, separation=2.0, save_dir="./plots"):

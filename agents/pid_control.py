@@ -208,7 +208,7 @@ def pid_throttle_control(target_speed, current_speed, prev_error, integral, dt ,
 
     return throttle, brake, error, integral
 
-def run_pid_drive_with_log(world, vehicle, route_waypoints, actual_path_x, actual_path_y, collision_event, kp_s, ki_s, kd_s, ke, kp_t, ki_t, kd_t, num, filename, max_steps=3500 ,output_dir = "dataset_town1_real" ):
+def run_pid_drive_with_log(world, vehicle, route_waypoints, actual_path_x, actual_path_y, collision_event, kp_s, ki_s, kd_s, ke, kp_t, ki_t, kd_t, num, filename, max_steps=3500 ,output_dir = "dataset_town4" ):
   
     """
       PID Controller을 이용해 주행을 하고, 

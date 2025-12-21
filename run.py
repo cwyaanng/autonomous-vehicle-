@@ -21,7 +21,7 @@ import numpy as np
 from datetime import datetime
 import matplotlib.pyplot as plt
 from env.env_set import attach_camera_sensor, attach_collision_sensor, connect_to_carla, spawn_vehicle
-from env.route import generate_route, generate_forward_route, visualize_all_waypoints
+from env.route import generate_forward_route_for_PID, visualize_all_waypoints
 from utils.visualize import generate_actual_path_plot, plot_carla_map
 import itertools
 
@@ -62,7 +62,8 @@ def pid_control(client, world, carla_map, start_coords, filename):
                                     # 가속 부분 P,I,D gain
         [0.5, 1.0],                # kp_t 
         [0.0, 0.05],               # ki_t 
-        [0.0, 0.05]                # kd_t 
+       # [0.0, 0.05]                # kd_t 
+        [0.0, 0.05] 
     )
     
     blueprint_library = world.get_blueprint_library()
@@ -77,7 +78,7 @@ def pid_control(client, world, carla_map, start_coords, filename):
     for i, (kp_s, ki_s, kd_s, ke, kp_t, ki_t, kd_t) in enumerate(param_combinations):
   
         """ 주행 경로 생성 """
-        route_waypoints = generate_forward_route(carla_map, start_coords)
+        route_waypoints = generate_forward_route_for_PID(carla_map, start_coords)
         
         if not route_waypoints:
             print("경로 생성 실패")
@@ -135,30 +136,37 @@ if __name__ == "__main__":
     mode = sys.argv[1].upper()
     print(mode)
     
-    client, world, carla_map = connect_to_carla()
+    client, world, carla_map = connect_to_carla("Town04")
     visualize_all_waypoints(carla_map)
     
     if mode == "PID":
-        start_coords = (0, 150)
-        pid_control(client, world, carla_map , start_coords,  "t1_route_1")
+        # start_coords = (0, 50)
+        # end_coords = (50, 0)
+        # pid_control(client, world, carla_map , start_coords, "route_1")
         
-        start_coords = (25, 110)
-        pid_control(client, world, carla_map , start_coords, "t1_route_2")
+        start_coords = (0, 100)
+        end_coords = (0, -200)
         
-        start_coords = (100, 200)
-        pid_control(client, world, carla_map , start_coords,  "t1_route_3")
+        pid_control(client, world, carla_map , start_coords, "route_2")
+        start_coords = (-450, 350)
+        end_coords = (0, 0) 
+        pid_control(client, world, carla_map , start_coords,  "route_3")
         
-        start_coords = (175, 300)
-        pid_control(client, world, carla_map, start_coords, "t1_route_4")
+        start_coords = (250, -100)
+        end_coords = (350, -200) 
+        pid_control(client, world, carla_map , start_coords, "route_4")
         
-        start_coords = (150, 180)
-        pid_control(client, world, carla_map,start_coords, "t1_route_5")
+        start_coords = (-350, 400)
+        end_coords = (0, 0) 
+        pid_control(client, world, carla_map , start_coords,  "route_5")
         
-        start_coords = (50,275)
-        pid_control(client, world, carla_map,start_coords, "t1_route_6")
+        start_coords = (200,100)
+        end_coords = (50,0)
+        pid_control(client, world, carla_map , start_coords, "route_6")
         
-        start_coords = (200,0)
-        pid_control(client, world, carla_map,start_coords, "t1_route_7")
+        start_coords = (100,100)
+        end_coords = (0,300)
+        pid_control(client, world, carla_map , start_coords, "route_7")
         
                
     if mode == "COLLECTION":

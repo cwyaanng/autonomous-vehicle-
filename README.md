@@ -22,7 +22,7 @@
 
 ---
 
-### result : 실험 결과
+### result : 1차 실험 결과 - 일반화 실험 이전 제안기법/모델 학습 결과 
 - 실험 결과 CSV 파일 저장 디렉토리
 - final_result_town3 : Town03 환경 실험 결과
 - final_result_town4 : Town04 환경 실험 결과
@@ -75,11 +75,11 @@ sudo docker run -it --rm \
   -p 2000-2002:2000-2002 \
   carlasim/carla:0.9.8 \
   ./CarlaUE4.sh -RenderOffScreen
-````
+```
 
 ---
 
-### 2. 학습 코드 실행
+### 2. 학습 진행 
 
 사용할 기법(제안 기법, CQL, AWAC, SAC)에 따라 아래 명령어 중 하나를 선택하여 실행합니다.
 
@@ -138,10 +138,11 @@ nohup python -u run_sac.py 0 0 Town03 > 파일이름.txt 2>&1 &
 ---
 
 ## 주행 시작 포인트
-* Town01 : start_point : (0,0) , end_point : (400, 350)
+* Town01 : (0,0)
 * Town02 : (250,250)
 * Town03 : (0, 0)
 * Town04 : (300, -100)
+* Town04 : (0, 0)
 
 ---
 
@@ -165,7 +166,14 @@ Town01 / Town02 / Town03 / Town04 / Town05
 
 ---
 
+## 모델 학습 
+
+- 일반화 실험 때 모델 학습 후 저장된 모델과 로그, 주행한 경로의 이미지들은 logs 폴더에 있습니다. 
+
+- result 폴더안에 일반화 실험 전에 학습을 실행하여 얻었던 결과들을 저장했습니다. training phase 동안 각 에피소드의 충돌여부(done_collided) / 도달여부(done_reached) / 에피소드가 나아간 waypoint 를 csv 파일 형태로 저장하였습니다. 
+ 
+
 ## 추가 문서
 
 * docs/SETUP.md : 환경 설정 과정 및 라이브러리 버전 
-
+* docs/EXPERIMENT.md : 앞으로 할 실험 절차 / 주의사항 / 현재 문제점 
