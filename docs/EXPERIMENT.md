@@ -148,7 +148,7 @@ result
 
 * **사용하는 파일** : make_plot.py 
 
-WAYPOINT_MAX 변수를 현재 town의 waypoint 개수에 맞게 변경해주세요! 
+WAYPOINT_MAX 변수를 현재 town의 waypoint 개수에 맞게 변경하고, 
 ROOT_DIR 경로를 데이터가 저장된 폴더 경로로 바꾸어주세요!! 
 예를 들어, result/final_result_town3/waypoint_ahead 폴더에 데이터가 저장되어 있다면 아래처럼 바꾸어 주시면 됩니다.
 
