@@ -164,7 +164,8 @@ OUTPUT_DIR = os.path.join(ROOT_DIR, "plots")
 
 * **사용하는 파일** : 
 
-ROOT_DIR 경로를 데이터가 저장된 폴더 경로로 바꾸어주세요!! 
+ROOT_DIR 경로를 데이터가 저장된 폴더 경로로 바꾸어주세요!!
+ 
 예를 들어, result/final_result_town3/waypoint_ahead 폴더에 데이터가 저장되어 있다면 아래처럼 바꾸어 주시면 됩니다.
 
 ```bash 
