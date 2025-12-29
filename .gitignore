@@ -1,23 +1,17 @@
+# Logs & Outputs
 PythonAPI/
 logs/
-models/
-d3rlpy_logs
-dataset_3/
-critic_loss_plot/
 실험로그/
-offline_data_for_replaybuffer/
-offline_data_visualization
+result/
 figs/
-TEST_일반화실험_Town03_to_Town01/
-TEST_일반화실험_Town03_to_Town04/
+d3rlpy_logs
+*.txt
+offline_data_for_replaybuffer/
+models/
+critic_loss_plot/
+offline_data_visualization
+
+# Unnecessaries
+.vscode
 __pycache__/
-town04/
-town04_데이터수집_2.txt
-town04_데이터수집_3.txt
-town04_데이터수집.txt
-route_1
-route_2
-dataset_town4
-route_3
-result/Town03_일반화실험_데이터
-route_4
+nohup.out
