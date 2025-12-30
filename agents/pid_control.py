@@ -261,7 +261,7 @@ def run_pid_drive_with_log(world, vehicle, route_waypoints, actual_path_x, actua
         obs = make_obs_from_waypoints(vehicle, waypoints_ahead , e , theta_e)
         
         """ 5. 위에서 계산한 에러를 PID controller 에 넣어서 steer, throttle 명령 생성 """
-        steer, steer_integral = pid_steering_control(e, theta_e, steer_prev_error, steer_integral, dt, ki_s, kp_s, kd_s, ke)
+        steer, steer_integral = pid_steering_control(e, theta_e, steer_prev_error, steer_integral, dt, kp_s, ki_s, kd_s, ke)
         steer_prev_error = e
         steer = 0.7 * steer + 0.3 * steer_prev 
         steer_prev = steer
@@ -279,7 +279,7 @@ def run_pid_drive_with_log(world, vehicle, route_waypoints, actual_path_x, actua
         """ 7. next state 생성 및 reward 계산 """
         next_loc = vehicle.get_location()
         next_waypoints = find_closest_waypoints_ahead(next_loc, route_waypoints)
-        next_idx = find_closest_waypoint_index(loc, route_waypoints)
+        next_idx = find_closest_waypoint_index(next_loc, route_waypoints)
         next_target_idx = min(next_idx + 5, len(route_waypoints) - 1)
         next_target_wp = route_waypoints[next_target_idx]
         ne, ntheta_e = compute_errors(vehicle, next_target_wp)
