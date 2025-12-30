@@ -162,10 +162,8 @@ if __name__ == "__main__":
         
         start_coords = (100,100)
         end_coords = (0,300)
-        pid_control(client, world, carla_map , start_coords, "route_7")
-        
-               
-    if mode == "COLLECTION":
+        pid_control(client, world, carla_map , start_coords, "route_7")         
+    elif mode == "COLLECTION":
         start_coords = (0,300)
         pid_control(client, world, carla_map,start_coords, "route_6")
         
